@@ -1,0 +1,78 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.python-version
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Backend local artifacts
+backend/.env
+backend/.env.*
+!backend/.env.example
+!backend/.env.*.example
+backend/.venv/
+backend/.pytest_cache/
+backend/.ruff_cache/
+backend/htmlcov/
+
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/coverage/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+!frontend/.env.*.example
+
+# Package manager caches
+.pnpm-store/
+.npm/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local project guidance
+AGENTS.md
+PROJECT_BRIEF.md
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Docker and local database volumes
+postgres-data/
+docker-data/
+tmp/
+*.sqlite
+*.sqlite3
+
+# Generated API types
+# Keep this commented until the frontend generation path is finalized.
+# frontend/src/api/schema.d.ts
