@@ -56,3 +56,23 @@ uv run pytest
 uv run ruff check .
 uv run ruff format --check .
 ```
+
+## Local Database
+
+Copy the example environment file if you want to override the default local database values:
+
+```bash
+cp .env.example .env
+```
+
+Start PostgreSQL from the repository root:
+
+```bash
+docker compose up -d postgres
+```
+
+The backend reads its own environment from `backend/.env`. Copy the example file before running database-backed features:
+
+```bash
+cp backend/.env.example backend/.env
+```
