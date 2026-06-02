@@ -40,3 +40,19 @@ A full-stack personal recipe and nutrition manager built with FastAPI, PostgreSQ
 ## Development Status
 
 This project is in early development. The initial focus is building the backend foundation with a small, tested FastAPI application before adding the database schema, authentication, recipe management, and frontend.
+
+## Backend Development
+
+From the `backend/` directory:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+Run backend tests and lint checks:
+
+```bash
+uv run pytest
+uv run ruff check .
+uv run ruff format --check .
+```
