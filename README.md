@@ -19,9 +19,10 @@ A full-stack personal recipe and nutrition manager built with FastAPI, PostgreSQ
 - Python
 - FastAPI
 - Pydantic
-- SQLAlchemy 2.0
+- SQLAlchemy 2.0 async ORM
 - Alembic
 - PostgreSQL
+- asyncpg
 - pytest
 - Ruff
 - uv
@@ -57,6 +58,12 @@ uv run ruff check .
 uv run ruff format --check .
 ```
 
+Run Alembic commands from the `backend/` directory:
+
+```bash
+uv run alembic -c alembic.ini current
+```
+
 ## Local Database
 
 Copy the example environment file if you want to override the default local database values:
@@ -75,4 +82,16 @@ The backend reads its own environment from `backend/.env`. Copy the example file
 
 ```bash
 cp backend/.env.example backend/.env
+```
+
+If your machine already has PostgreSQL running on port `5432`, use another host port for this project's Docker database. For example:
+
+```env
+POSTGRES_PORT=5433
+```
+
+Then update `backend/.env` to use the same host port:
+
+```env
+DATABASE_URL=postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5433/recipe_app
 ```
