@@ -50,3 +50,15 @@ def client() -> Generator[TestClient]:
     finally:
         asyncio.run(delete_test_users())
         app.dependency_overrides.clear()
+
+
+def register_user(
+    client: TestClient,
+    email: str = "login.user@example.com",
+    password: str = "securepass123",
+) -> None:
+    response = client.post(
+        "/auth/register",
+        json={"email": email, "password": password},
+    )
+    assert response.status_code == 201

@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
 import jwt
+from jwt import InvalidTokenError
 from pwdlib import PasswordHash
 
 from app.core.config import settings
@@ -26,3 +27,20 @@ def create_access_token(subject: str) -> str:
         settings.jwt_secret_key,
         algorithm=settings.jwt_algorithm,
     )
+
+
+def decode_access_token(token: str) -> str:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.jwt_secret_key,
+            algorithms=[settings.jwt_algorithm],
+        )
+    except InvalidTokenError as error:
+        raise ValueError("Invalid access token") from error
+
+    subject = payload.get("sub")
+    if not isinstance(subject, str) or not subject:
+        raise ValueError("Invalid access token subject")
+
+    return subject
