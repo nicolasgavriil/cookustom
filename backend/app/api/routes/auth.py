@@ -4,21 +4,26 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import hash_password
+from app.core.security import create_access_token, hash_password, verify_password
 from app.db.database import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserRead
+from app.schemas.user import (
+    LoginRequest,
+    TokenResponse,
+    UserCreateRequest,
+    UserResponse,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post(
     "/register",
-    response_model=UserRead,
+    response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def register_user(
-    user_create: UserCreate,
+    user_create: UserCreateRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> User:
     email = user_create.email.lower()
@@ -39,3 +44,20 @@ async def register_user(
     await db.refresh(user)
 
     return user
+
+
+@router.post("/login", response_model=TokenResponse)
+async def login_user(
+    user_login: LoginRequest,
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> TokenResponse:
+    email = user_login.email.lower()
+    user = await db.scalar(select(User).where(User.email == email))
+
+    if user is None or not verify_password(user_login.password, user.password_hash):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
+    return TokenResponse(access_token=create_access_token(subject=str(user.id)))
