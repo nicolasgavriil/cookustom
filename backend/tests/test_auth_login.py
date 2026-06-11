@@ -1,16 +1,6 @@
 from fastapi.testclient import TestClient
 
-
-def register_user(
-    client: TestClient,
-    email: str = "login.user@example.com",
-    password: str = "securepass123",
-) -> None:
-    response = client.post(
-        "/auth/register",
-        json={"email": email, "password": password},
-    )
-    assert response.status_code == 201
+from tests.conftest import register_user
 
 
 def test_login_user_returns_access_token(client: TestClient) -> None:

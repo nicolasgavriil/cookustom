@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.dependencies import get_current_user
 from app.core.security import create_access_token, hash_password, verify_password
 from app.db.database import get_db
 from app.models.user import User
@@ -61,3 +62,10 @@ async def login_user(
         )
 
     return TokenResponse(access_token=create_access_token(subject=str(user.id)))
+
+
+@router.get("/me", response_model=UserResponse)
+async def read_current_user(
+    current_user: Annotated[User, Depends(get_current_user)],
+) -> User:
+    return current_user
