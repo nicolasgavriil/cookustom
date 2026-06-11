@@ -13,9 +13,11 @@ from app.main import app
 from app.models.user import User
 
 TEST_EMAILS = {
+    "login.user@example.com",
     "new.user@example.com",
     "duplicate@example.com",
     "mixed.case@example.com",
+    "unknown@example.com",
 }
 
 test_engine = create_async_engine(settings.database_url, poolclass=NullPool)
