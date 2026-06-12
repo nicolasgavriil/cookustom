@@ -1,16 +1,23 @@
 import './App.css'
+import { Route, Routes } from 'react-router'
 
-function App() {
+import { NavBar } from './components/NavBar'
+import { DashboardPage } from './pages/DashboardPage'
+import { LoginPage } from './pages/LoginPage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { RegisterPage } from './pages/RegisterPage'
+
+const App = () => {
   return (
     <main className="app">
-      <section className="app__intro">
-        <p className="app__eyebrow">Recipe App</p>
-        <h1>Personal recipe and nutrition manager</h1>
-        <p>
-          Frontend scaffold is ready. Authentication screens and API integration
-          will be added in the next frontend slice.
-        </p>
-      </section>
+      <NavBar />
+
+      <Routes>
+        <Route path="/" element={<DashboardPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
     </main>
   )
 }
