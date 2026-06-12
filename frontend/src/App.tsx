@@ -1,4 +1,3 @@
-import './App.css'
 import { Route, Routes } from 'react-router'
 
 import { NavBar } from './components/NavBar'
@@ -9,7 +8,7 @@ import { RegisterPage } from './pages/RegisterPage'
 
 const App = () => {
   return (
-    <main className="app">
+    <main className="min-h-screen px-6 py-12 sm:px-8">
       <NavBar />
 
       <Routes>
