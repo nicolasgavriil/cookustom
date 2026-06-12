@@ -95,3 +95,25 @@ Then update `backend/.env` to use the same host port:
 ```env
 DATABASE_URL=postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5433/recipe_app
 ```
+
+## Frontend Development
+
+Enable package manager shims if `pnpm` is not already available:
+
+```bash
+corepack enable
+```
+
+From the `frontend/` directory:
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Run frontend checks:
+
+```bash
+pnpm lint
+pnpm build
+```
