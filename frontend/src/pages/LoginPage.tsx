@@ -1,28 +1,24 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { AuthForm } from '../components/AuthForm'
-import * as authService from '../services/authService'
-import { tokenStorage } from '../utils/tokenStorage'
+import { useLoginMutation } from '../queries/authQueries'
 
 export const LoginPage = () => {
   const navigate = useNavigate()
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const loginMutation = useLoginMutation()
+  const authError =
+    loginMutation.error instanceof Error ? loginMutation.error.message : null
 
-  const handleSubmit = async (email: string, password: string) => {
-    setAuthError(null)
-    setIsSubmitting(true)
-
-    try {
-      const token = await authService.login({ email, password })
-      tokenStorage.setAccessToken(token.access_token)
-      navigate('/')
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : 'Login failed')
-    } finally {
-      setIsSubmitting(false)
-    }
+  const handleSubmit = (email: string, password: string) => {
+    loginMutation.reset()
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate('/')
+        },
+      },
+    )
   }
 
   return (
@@ -39,7 +35,7 @@ export const LoginPage = () => {
       <AuthForm
         submitLabel="Log in"
         error={authError}
-        isSubmitting={isSubmitting}
+        isSubmitting={loginMutation.isPending}
         passwordAutoComplete="current-password"
         passwordMinLength={1}
         onSubmit={handleSubmit}

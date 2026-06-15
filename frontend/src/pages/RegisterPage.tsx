@@ -1,31 +1,26 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import { AuthForm } from '../components/AuthForm'
-import * as authService from '../services/authService'
-import { tokenStorage } from '../utils/tokenStorage'
+import { useRegisterMutation } from '../queries/authQueries'
 
 export const RegisterPage = () => {
   const navigate = useNavigate()
-  const [authError, setAuthError] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const registerMutation = useRegisterMutation()
+  const authError =
+    registerMutation.error instanceof Error
+      ? registerMutation.error.message
+      : null
 
-  const handleSubmit = async (email: string, password: string) => {
-    setAuthError(null)
-    setIsSubmitting(true)
-
-    try {
-      await authService.register({ email, password })
-      const token = await authService.login({ email, password })
-      tokenStorage.setAccessToken(token.access_token)
-      navigate('/')
-    } catch (error) {
-      setAuthError(
-        error instanceof Error ? error.message : 'Registration failed',
-      )
-    } finally {
-      setIsSubmitting(false)
-    }
+  const handleSubmit = (email: string, password: string) => {
+    registerMutation.reset()
+    registerMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          navigate('/')
+        },
+      },
+    )
   }
 
   return (
@@ -42,7 +37,7 @@ export const RegisterPage = () => {
       <AuthForm
         submitLabel="Create account"
         error={authError}
-        isSubmitting={isSubmitting}
+        isSubmitting={registerMutation.isPending}
         passwordAutoComplete="new-password"
         passwordMinLength={8}
         onSubmit={handleSubmit}
