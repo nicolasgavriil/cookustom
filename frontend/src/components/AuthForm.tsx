@@ -6,7 +6,7 @@ type AuthFormProps = {
   isSubmitting: boolean
   passwordAutoComplete: 'current-password' | 'new-password'
   passwordMinLength: number
-  onSubmit: (email: string, password: string) => Promise<void>
+  onSubmit: (email: string, password: string) => void
 }
 
 export const AuthForm = ({
@@ -17,14 +17,14 @@ export const AuthForm = ({
   passwordMinLength,
   onSubmit,
 }: AuthFormProps) => {
-  const handleSubmit = async (event: SyntheticEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
     const email = String(formData.get('email') ?? '')
     const password = String(formData.get('password') ?? '')
 
-    await onSubmit(email, password)
+    onSubmit(email, password)
   }
 
   return (
