@@ -13,6 +13,20 @@ from app.schemas.ingredient import IngredientCreateRequest, IngredientResponse
 router = APIRouter(prefix="/ingredients", tags=["ingredients"])
 
 
+@router.get("", response_model=list[IngredientResponse])
+async def list_ingredients(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[Ingredient]:
+    result = await db.scalars(
+        select(Ingredient)
+        .where(Ingredient.user_id == current_user.id)
+        .order_by(Ingredient.name)
+    )
+
+    return list(result)
+
+
 @router.post(
     "",
     response_model=IngredientResponse,
