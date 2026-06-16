@@ -8,7 +8,11 @@ from app.api.dependencies import get_current_user
 from app.db.database import get_db
 from app.models.ingredient import Ingredient
 from app.models.user import User
-from app.schemas.ingredient import IngredientCreateRequest, IngredientResponse
+from app.schemas.ingredient import (
+    IngredientCreateRequest,
+    IngredientResponse,
+    IngredientUpdateRequest,
+)
 
 router = APIRouter(prefix="/ingredients", tags=["ingredients"])
 
@@ -56,6 +60,47 @@ async def create_ingredient(
         calories_per_unit=ingredient_create.calories_per_unit,
     )
     db.add(ingredient)
+    await db.commit()
+    await db.refresh(ingredient)
+
+    return ingredient
+
+
+@router.put("/{ingredient_id}", response_model=IngredientResponse)
+async def update_ingredient(
+    ingredient_id: int,
+    ingredient_update: IngredientUpdateRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Ingredient:
+    ingredient = await db.scalar(
+        select(Ingredient).where(
+            Ingredient.id == ingredient_id,
+            Ingredient.user_id == current_user.id,
+        )
+    )
+    if ingredient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ingredient not found",
+        )
+
+    duplicate_ingredient = await db.scalar(
+        select(Ingredient).where(
+            Ingredient.user_id == current_user.id,
+            Ingredient.name == ingredient_update.name,
+            Ingredient.id != ingredient.id,
+        )
+    )
+    if duplicate_ingredient is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Ingredient already exists",
+        )
+
+    ingredient.name = ingredient_update.name
+    ingredient.unit = ingredient_update.unit
+    ingredient.calories_per_unit = ingredient_update.calories_per_unit
     await db.commit()
     await db.refresh(ingredient)
 

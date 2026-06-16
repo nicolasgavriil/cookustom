@@ -21,6 +21,20 @@ class IngredientCreateRequest(BaseModel):
         return name
 
 
+class IngredientUpdateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    unit: IngredientUnit
+    calories_per_unit: Decimal = Field(ge=0, max_digits=10, decimal_places=4)
+
+    @field_validator("name")
+    @classmethod
+    def normalize_name(cls, value: str) -> str:
+        name = value.strip()
+        if not name:
+            raise ValueError("Name cannot be empty")
+        return name
+
+
 class IngredientResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
