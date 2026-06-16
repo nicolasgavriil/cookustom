@@ -105,3 +105,25 @@ async def update_ingredient(
     await db.refresh(ingredient)
 
     return ingredient
+
+
+@router.delete("/{ingredient_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_ingredient(
+    ingredient_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> None:
+    ingredient = await db.scalar(
+        select(Ingredient).where(
+            Ingredient.id == ingredient_id,
+            Ingredient.user_id == current_user.id,
+        )
+    )
+    if ingredient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ingredient not found",
+        )
+
+    await db.delete(ingredient)
+    await db.commit()
