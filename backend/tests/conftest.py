@@ -3,16 +3,18 @@ from collections.abc import AsyncGenerator, Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import delete
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 from app.db.database import get_db
 from app.main import app
+from app.models.ingredient import Ingredient
 from app.models.user import User
 
 TEST_EMAILS = {
+    "another.user@example.com",
     "login.user@example.com",
     "new.user@example.com",
     "duplicate@example.com",
@@ -35,6 +37,10 @@ async def override_get_db() -> AsyncGenerator[AsyncSession]:
 
 async def delete_test_users() -> None:
     async with TestAsyncSessionLocal() as session:
+        test_user_ids = select(User.id).where(User.email.in_(TEST_EMAILS))
+        await session.execute(
+            delete(Ingredient).where(Ingredient.user_id.in_(test_user_ids))
+        )
         await session.execute(delete(User).where(User.email.in_(TEST_EMAILS)))
         await session.commit()
 
@@ -62,3 +68,16 @@ def register_user(
         json={"email": email, "password": password},
     )
     assert response.status_code == 201
+
+
+def login_user(
+    client: TestClient,
+    email: str = "login.user@example.com",
+    password: str = "securepass123",
+) -> str:
+    response = client.post(
+        "/auth/login",
+        json={"email": email, "password": password},
+    )
+    assert response.status_code == 200
+    return response.json()["access_token"]
