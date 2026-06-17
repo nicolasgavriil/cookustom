@@ -17,6 +17,12 @@ export const NavBar = () => {
       <div className="flex flex-col gap-3 sm:flex-row sm:gap-6">
         {currentUserQuery.data ? (
           <>
+            <Link
+              className="font-bold text-gray-900 no-underline"
+              to="/ingredients"
+            >
+              Ingredients
+            </Link>
             <span className="font-medium text-gray-700">
               {currentUserQuery.data.email}
             </span>
