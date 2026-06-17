@@ -19,6 +19,29 @@ export type TokenResponse = {
   token_type: 'bearer'
 }
 
+export type IngredientUnit = 'g' | 'ml' | 'piece'
+
+export type Ingredient = {
+  id: number
+  user_id: number
+  name: string
+  unit: IngredientUnit
+  calories_per_unit: string
+  created_at: string
+}
+
+export type IngredientCreateRequest = {
+  name: string
+  unit: IngredientUnit
+  calories_per_unit: string
+}
+
+export type IngredientUpdateRequest = {
+  name: string
+  unit: IngredientUnit
+  calories_per_unit: string
+}
+
 export type ApiErrorResponse = {
   detail: string
 }
