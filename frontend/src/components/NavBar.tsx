@@ -1,10 +1,16 @@
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { useCurrentUserQuery, useLogout } from '../queries/authQueries'
 
 export const NavBar = () => {
+  const navigate = useNavigate()
   const currentUserQuery = useCurrentUserQuery()
   const logout = useLogout()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
 
   return (
     <nav
@@ -29,7 +35,7 @@ export const NavBar = () => {
             <button
               className="cursor-pointer border-0 bg-transparent p-0 text-left font-bold text-gray-900"
               type="button"
-              onClick={logout}
+              onClick={handleLogout}
             >
               Log out
             </button>
