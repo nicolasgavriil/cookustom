@@ -1,10 +1,28 @@
 import { Link } from 'react-router'
 
-import { useIngredientsQuery } from '../queries/ingredientQueries'
+import {
+  useDeleteIngredientMutation,
+  useIngredientsQuery,
+} from '../queries/ingredientQueries'
 
 export const IngredientsPage = () => {
   const ingredientsQuery = useIngredientsQuery()
+  const deleteIngredientMutation = useDeleteIngredientMutation()
   const ingredients = ingredientsQuery.data ?? []
+  const deletingIngredientId = deleteIngredientMutation.variables ?? null
+
+  const handleDelete = (ingredientId: number, ingredientName: string) => {
+    const shouldDelete = window.confirm(
+      `Delete ${ingredientName}? This cannot be undone.`,
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
+    deleteIngredientMutation.reset()
+    deleteIngredientMutation.mutate(ingredientId)
+  }
 
   return (
     <section className="mx-auto max-w-5xl">
@@ -34,6 +52,14 @@ export const IngredientsPage = () => {
           {ingredientsQuery.error instanceof Error
             ? ingredientsQuery.error.message
             : 'Unable to load ingredients'}
+        </p>
+      ) : null}
+
+      {deleteIngredientMutation.isError ? (
+        <p className="mt-8 text-red-600">
+          {deleteIngredientMutation.error instanceof Error
+            ? deleteIngredientMutation.error.message
+            : 'Unable to delete ingredient'}
         </p>
       ) : null}
 
@@ -67,12 +93,30 @@ export const IngredientsPage = () => {
                     {ingredient.calories_per_unit}
                   </td>
                   <td className="py-3">
-                    <Link
-                      className="font-bold text-gray-900 no-underline"
-                      to={`/ingredients/${ingredient.id}/edit`}
-                    >
-                      Edit
-                    </Link>
+                    <div className="flex gap-4">
+                      <Link
+                        className="font-bold text-gray-900 no-underline"
+                        to={`/ingredients/${ingredient.id}/edit`}
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        className="cursor-pointer border-0 bg-transparent p-0 font-bold text-red-600 disabled:cursor-not-allowed disabled:text-red-300"
+                        type="button"
+                        disabled={
+                          deleteIngredientMutation.isPending &&
+                          deletingIngredientId === ingredient.id
+                        }
+                        onClick={() =>
+                          handleDelete(ingredient.id, ingredient.name)
+                        }
+                      >
+                        {deleteIngredientMutation.isPending &&
+                        deletingIngredientId === ingredient.id
+                          ? 'Deleting...'
+                          : 'Delete'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
