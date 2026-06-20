@@ -1,23 +1,25 @@
 import { useForm } from 'react-hook-form'
 
-import type { IngredientCreateRequest, IngredientUnit } from '../api/types'
+import type { IngredientUnit } from '../api/types'
 
-type IngredientFormValues = {
+export type IngredientFormValues = {
   name: string
   unit: IngredientUnit
   calories_per_unit: string
 }
 
 type IngredientFormProps = {
+  defaultValues?: IngredientFormValues
   submitLabel: string
   error: string | null
   isSubmitting: boolean
-  onSubmit: (request: IngredientCreateRequest) => void
+  onSubmit: (values: IngredientFormValues) => void
 }
 
 const unitOptions: IngredientUnit[] = ['g', 'ml', 'piece']
 
 export const IngredientForm = ({
+  defaultValues,
   submitLabel,
   error,
   isSubmitting,
@@ -28,7 +30,7 @@ export const IngredientForm = ({
     handleSubmit,
     formState: { errors },
   } = useForm<IngredientFormValues>({
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       name: '',
       unit: 'g',
       calories_per_unit: '',

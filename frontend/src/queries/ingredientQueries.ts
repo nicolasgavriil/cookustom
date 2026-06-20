@@ -1,6 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import type { IngredientCreateRequest } from '../api/types'
+import type {
+  IngredientCreateRequest,
+  IngredientUpdateRequest,
+} from '../api/types'
 import * as ingredientService from '../services/ingredientService'
 
 export const ingredientsQueryKey = ['ingredients'] as const
@@ -18,6 +21,23 @@ export const useCreateIngredientMutation = () => {
   return useMutation({
     mutationFn: (request: IngredientCreateRequest) =>
       ingredientService.createIngredient(request),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ingredientsQueryKey })
+    },
+  })
+}
+
+export const useUpdateIngredientMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      ingredientId,
+      request,
+    }: {
+      ingredientId: number
+      request: IngredientUpdateRequest
+    }) => ingredientService.updateIngredient(ingredientId, request),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ingredientsQueryKey })
     },
