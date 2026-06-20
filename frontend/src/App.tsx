@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router'
 
 import { NavBar } from './components/NavBar'
+import { RequireAuth } from './components/RequireAuth'
 import { DashboardPage } from './pages/DashboardPage'
 import { EditIngredientPage } from './pages/EditIngredientPage'
 import { IngredientsPage } from './pages/IngredientsPage'
@@ -16,11 +17,29 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<DashboardPage />} />
-        <Route path="/ingredients" element={<IngredientsPage />} />
-        <Route path="/ingredients/new" element={<NewIngredientPage />} />
+        <Route
+          path="/ingredients"
+          element={
+            <RequireAuth>
+              <IngredientsPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/ingredients/new"
+          element={
+            <RequireAuth>
+              <NewIngredientPage />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/ingredients/:ingredientId/edit"
-          element={<EditIngredientPage />}
+          element={
+            <RequireAuth>
+              <EditIngredientPage />
+            </RequireAuth>
+          }
         />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
