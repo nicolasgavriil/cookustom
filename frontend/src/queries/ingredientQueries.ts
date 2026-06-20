@@ -43,3 +43,15 @@ export const useUpdateIngredientMutation = () => {
     },
   })
 }
+
+export const useDeleteIngredientMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (ingredientId: number) =>
+      ingredientService.deleteIngredient(ingredientId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ingredientsQueryKey })
+    },
+  })
+}
