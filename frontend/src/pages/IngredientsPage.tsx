@@ -52,6 +52,7 @@ export const IngredientsPage = () => {
                 <th className="py-3 pr-4 font-semibold">Name</th>
                 <th className="py-3 pr-4 font-semibold">Unit</th>
                 <th className="py-3 pr-4 font-semibold">Calories per unit</th>
+                <th className="py-3 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -64,6 +65,14 @@ export const IngredientsPage = () => {
                   <td className="py-3 pr-4">{ingredient.unit}</td>
                   <td className="py-3 pr-4">
                     {ingredient.calories_per_unit}
+                  </td>
+                  <td className="py-3">
+                    <Link
+                      className="font-bold text-gray-900 no-underline"
+                      to={`/ingredients/${ingredient.id}/edit`}
+                    >
+                      Edit
+                    </Link>
                   </td>
                 </tr>
               ))}
