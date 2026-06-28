@@ -1,10 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-IngredientUnit = Literal["g", "ml", "piece"]
+from app.domain.ingredient import IngredientUnit
 
 
 class IngredientCreateRequest(BaseModel):
