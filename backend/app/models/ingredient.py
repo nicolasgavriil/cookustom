@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 from datetime import datetime
 from decimal import Decimal
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     CheckConstraint,
@@ -10,9 +13,13 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
+from app.domain.ingredient import IngredientUnit
+
+if TYPE_CHECKING:
+    from app.models.recipe import RecipeIngredient
 
 
 class Ingredient(Base):
@@ -31,9 +38,12 @@ class Ingredient(Base):
         index=True,
     )
     name: Mapped[str] = mapped_column(String(255))
-    unit: Mapped[str] = mapped_column(String(20))
+    unit: Mapped[IngredientUnit] = mapped_column(String(20))
     calories_per_unit: Mapped[Decimal] = mapped_column(Numeric(10, 4))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+    )
+    recipe_ingredients: Mapped[list[RecipeIngredient]] = relationship(
+        back_populates="ingredient",
     )

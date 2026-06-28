@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.db.database import get_db
 from app.main import app
 from app.models.ingredient import Ingredient
+from app.models.recipe import Recipe
 from app.models.user import User
 
 TEST_EMAILS = {
@@ -38,6 +39,7 @@ async def override_get_db() -> AsyncGenerator[AsyncSession]:
 async def delete_test_users() -> None:
     async with TestAsyncSessionLocal() as session:
         test_user_ids = select(User.id).where(User.email.in_(TEST_EMAILS))
+        await session.execute(delete(Recipe).where(Recipe.user_id.in_(test_user_ids)))
         await session.execute(
             delete(Ingredient).where(Ingredient.user_id.in_(test_user_ids))
         )
