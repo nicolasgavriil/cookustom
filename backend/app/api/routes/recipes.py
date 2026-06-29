@@ -34,6 +34,33 @@ async def list_recipes(
     return list(result)
 
 
+@router.get("/{recipe_id}", response_model=RecipeResponse)
+async def get_recipe(
+    recipe_id: int,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Recipe:
+    recipe = await db.scalar(
+        select(Recipe)
+        .options(
+            selectinload(Recipe.recipe_ingredients).joinedload(
+                RecipeIngredient.ingredient
+            )
+        )
+        .where(
+            Recipe.id == recipe_id,
+            Recipe.user_id == current_user.id,
+        )
+    )
+    if recipe is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recipe not found",
+        )
+
+    return recipe
+
+
 @router.post(
     "",
     response_model=RecipeResponse,
