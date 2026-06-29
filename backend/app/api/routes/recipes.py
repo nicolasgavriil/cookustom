@@ -3,6 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api.dependencies import get_current_user
 from app.db.database import get_db
@@ -12,6 +13,25 @@ from app.models.user import User
 from app.schemas.recipe import RecipeCreateRequest, RecipeResponse
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
+
+
+@router.get("", response_model=list[RecipeResponse])
+async def list_recipes(
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> list[Recipe]:
+    result = await db.scalars(
+        select(Recipe)
+        .options(
+            selectinload(Recipe.recipe_ingredients).joinedload(
+                RecipeIngredient.ingredient
+            )
+        )
+        .where(Recipe.user_id == current_user.id)
+        .order_by(Recipe.created_at.desc(), Recipe.id.desc())
+    )
+
+    return list(result)
 
 
 @router.post(
