@@ -10,7 +10,7 @@ from app.db.database import get_db
 from app.models.ingredient import Ingredient
 from app.models.recipe import Recipe, RecipeIngredient
 from app.models.user import User
-from app.schemas.recipe import RecipeCreateRequest, RecipeResponse
+from app.schemas.recipe import RecipeCreateRequest, RecipeResponse, RecipeUpdateRequest
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
@@ -61,6 +61,58 @@ async def get_recipe(
     return recipe
 
 
+@router.put("/{recipe_id}", response_model=RecipeResponse)
+async def update_recipe(
+    recipe_id: int,
+    recipe_update: RecipeUpdateRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Recipe:
+    recipe = await db.scalar(
+        select(Recipe)
+        .options(
+            selectinload(Recipe.recipe_ingredients).joinedload(
+                RecipeIngredient.ingredient
+            )
+        )
+        .where(
+            Recipe.id == recipe_id,
+            Recipe.user_id == current_user.id,
+        )
+    )
+    if recipe is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recipe not found",
+        )
+
+    ingredient_input_ids = [
+        ingredient_input.ingredient_id for ingredient_input in recipe_update.ingredients
+    ]
+    ingredients = await db.scalars(
+        select(Ingredient).where(
+            Ingredient.user_id == current_user.id,
+            Ingredient.id.in_(ingredient_input_ids),
+        )
+    )
+    ingredients_by_id = {ingredient.id: ingredient for ingredient in ingredients}
+
+    if len(ingredients_by_id) != len(ingredient_input_ids):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ingredient not found",
+        )
+
+    recipe.title = recipe_update.title
+    recipe.description = recipe_update.description
+    recipe.base_servings = recipe_update.base_servings
+    recipe.instructions = recipe_update.instructions
+    sync_recipe_ingredients(recipe, recipe_update, ingredients_by_id)
+    await db.commit()
+
+    return recipe
+
+
 @router.post(
     "",
     response_model=RecipeResponse,
@@ -71,18 +123,18 @@ async def create_recipe(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Recipe:
-    ingredient_ids = [
+    ingredient_input_ids = [
         ingredient_input.ingredient_id for ingredient_input in recipe_create.ingredients
     ]
     ingredients = await db.scalars(
         select(Ingredient).where(
             Ingredient.user_id == current_user.id,
-            Ingredient.id.in_(ingredient_ids),
+            Ingredient.id.in_(ingredient_input_ids),
         )
     )
     ingredients_by_id = {ingredient.id: ingredient for ingredient in ingredients}
 
-    if len(ingredients_by_id) != len(ingredient_ids):
+    if len(ingredients_by_id) != len(ingredient_input_ids):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ingredient not found",
@@ -107,3 +159,43 @@ async def create_recipe(
     await db.commit()
 
     return recipe
+
+
+def sync_recipe_ingredients(
+    recipe: Recipe,
+    recipe_update: RecipeUpdateRequest,
+    ingredients_by_id: dict[int, Ingredient],
+) -> None:
+    existing_by_ingredient_id = {
+        recipe_ingredient.ingredient_id: recipe_ingredient
+        for recipe_ingredient in recipe.recipe_ingredients
+    }
+    incoming_ingredient_ids = {
+        ingredient_input.ingredient_id for ingredient_input in recipe_update.ingredients
+    }
+
+    recipe.recipe_ingredients[:] = [
+        recipe_ingredient
+        for recipe_ingredient in recipe.recipe_ingredients
+        if recipe_ingredient.ingredient_id in incoming_ingredient_ids
+    ]
+
+    for ingredient_input in recipe_update.ingredients:
+        existing_recipe_ingredient = existing_by_ingredient_id.get(
+            ingredient_input.ingredient_id
+        )
+        if existing_recipe_ingredient is None:
+            recipe.recipe_ingredients.append(
+                RecipeIngredient(
+                    ingredient_id=ingredient_input.ingredient_id,
+                    ingredient=ingredients_by_id[ingredient_input.ingredient_id],
+                    quantity=ingredient_input.quantity,
+                )
+            )
+            continue
+
+        existing_recipe_ingredient.quantity = ingredient_input.quantity
+
+    recipe.recipe_ingredients.sort(
+        key=lambda recipe_ingredient: recipe_ingredient.ingredient_id
+    )
