@@ -81,8 +81,8 @@ def test_create_recipe_creates_recipe_with_calorie_summary(
     assert data["base_servings"] == 2
     assert data["instructions"] == "Cook rice. Add egg."
     assert "created_at" in data
-    assert data["total_calories"] == "270.0000"
-    assert data["calories_per_serving"] == "135.0000"
+    assert data["total_calories"] == 270
+    assert data["calories_per_serving"] == 135
     assert data["ingredients"] == [
         {
             "ingredient_id": rice["id"],
@@ -90,7 +90,7 @@ def test_create_recipe_creates_recipe_with_calorie_summary(
             "unit": "g",
             "quantity": "100",
             "calories_per_unit": "1.3000",
-            "calories": "130.0000",
+            "calories": 130,
         },
         {
             "ingredient_id": egg["id"],
@@ -98,9 +98,43 @@ def test_create_recipe_creates_recipe_with_calorie_summary(
             "unit": "piece",
             "quantity": "2",
             "calories_per_unit": "70.0000",
-            "calories": "140.0000",
+            "calories": 140,
         },
     ]
+
+
+def test_create_recipe_returns_calculated_calories_as_whole_numbers(
+    client: TestClient,
+) -> None:
+    register_user(client)
+    token = login_user(client)
+    oil = create_ingredient(
+        client,
+        token,
+        name="Oil",
+        unit="ml",
+        calories_per_unit="2.6",
+    )
+
+    response = client.post(
+        "/recipes",
+        headers=auth_headers(token),
+        json={
+            "title": "Dressing",
+            "description": None,
+            "base_servings": 1,
+            "instructions": "Mix.",
+            "ingredients": [
+                {"ingredient_id": oil["id"], "quantity": "1"},
+            ],
+        },
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["ingredients"][0]["calories"] == 3
+    assert data["total_calories"] == 3
+    assert data["calories_per_serving"] == 3
 
 
 def test_create_recipe_rejects_missing_token(client: TestClient) -> None:

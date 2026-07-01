@@ -83,8 +83,8 @@ def test_get_recipe_returns_recipe_with_nested_ingredients_and_calories(
     assert data["description"] == "Simple meal"
     assert data["base_servings"] == 2
     assert data["instructions"] == "Cook and serve."
-    assert_decimal_equal(data["total_calories"], "130")
-    assert_decimal_equal(data["calories_per_serving"], "65")
+    assert data["total_calories"] == 130
+    assert data["calories_per_serving"] == 65
 
     ingredient = data["ingredients"][0]
     assert ingredient["ingredient_id"] == rice["id"]
@@ -92,7 +92,7 @@ def test_get_recipe_returns_recipe_with_nested_ingredients_and_calories(
     assert ingredient["unit"] == "g"
     assert_decimal_equal(ingredient["quantity"], "100")
     assert_decimal_equal(ingredient["calories_per_unit"], "1.3")
-    assert_decimal_equal(ingredient["calories"], "130")
+    assert ingredient["calories"] == 130
 
 
 def test_get_recipe_rejects_missing_token(client: TestClient) -> None:

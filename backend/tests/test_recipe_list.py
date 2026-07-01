@@ -132,8 +132,8 @@ def test_list_recipes_includes_nested_ingredients_and_calories(
     assert len(data) == 1
     recipe = data[0]
     assert recipe["title"] == "Rice bowl"
-    assert_decimal_equal(recipe["total_calories"], "270")
-    assert_decimal_equal(recipe["calories_per_serving"], "135")
+    assert recipe["total_calories"] == 270
+    assert recipe["calories_per_serving"] == 135
 
     rice_response = recipe["ingredients"][0]
     assert rice_response["ingredient_id"] == rice["id"]
@@ -141,7 +141,7 @@ def test_list_recipes_includes_nested_ingredients_and_calories(
     assert rice_response["unit"] == "g"
     assert_decimal_equal(rice_response["quantity"], "100")
     assert_decimal_equal(rice_response["calories_per_unit"], "1.3")
-    assert_decimal_equal(rice_response["calories"], "130")
+    assert rice_response["calories"] == 130
 
     egg_response = recipe["ingredients"][1]
     assert egg_response["ingredient_id"] == egg["id"]
@@ -149,7 +149,7 @@ def test_list_recipes_includes_nested_ingredients_and_calories(
     assert egg_response["unit"] == "piece"
     assert_decimal_equal(egg_response["quantity"], "2")
     assert_decimal_equal(egg_response["calories_per_unit"], "70")
-    assert_decimal_equal(egg_response["calories"], "140")
+    assert egg_response["calories"] == 140
 
 
 def test_list_recipes_returns_newest_recipe_first(client: TestClient) -> None:
