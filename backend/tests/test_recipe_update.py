@@ -120,8 +120,8 @@ def test_update_recipe_updates_fields_and_ingredients(client: TestClient) -> Non
     assert data["description"] == "Updated description"
     assert data["base_servings"] == 4
     assert data["instructions"] == "Updated instructions."
-    assert_decimal_equal(data["total_calories"], "695")
-    assert_decimal_equal(data["calories_per_serving"], "173.75")
+    assert data["total_calories"] == 695
+    assert data["calories_per_serving"] == 174
 
     ingredient_ids = {ingredient["ingredient_id"] for ingredient in data["ingredients"]}
     assert ingredient_ids == {rice["id"], chicken["id"]}
@@ -138,7 +138,7 @@ def test_update_recipe_updates_fields_and_ingredients(client: TestClient) -> Non
     assert rice_response["unit"] == "g"
     assert_decimal_equal(rice_response["quantity"], "150")
     assert_decimal_equal(rice_response["calories_per_unit"], "1.3")
-    assert_decimal_equal(rice_response["calories"], "195")
+    assert rice_response["calories"] == 195
 
     chicken_response = next(
         ingredient
@@ -149,7 +149,7 @@ def test_update_recipe_updates_fields_and_ingredients(client: TestClient) -> Non
     assert chicken_response["unit"] == "g"
     assert_decimal_equal(chicken_response["quantity"], "200")
     assert_decimal_equal(chicken_response["calories_per_unit"], "2.5")
-    assert_decimal_equal(chicken_response["calories"], "500")
+    assert chicken_response["calories"] == 500
 
 
 def test_update_recipe_rejects_missing_token(client: TestClient) -> None:
