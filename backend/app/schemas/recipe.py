@@ -55,6 +55,10 @@ class RecipeCreateRequest(BaseModel):
         return value
 
 
+class RecipeUpdateRequest(RecipeCreateRequest):
+    pass
+
+
 class RecipeIngredientResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
