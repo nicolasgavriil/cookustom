@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 import { useRecipesQuery } from '../queries/recipeQueries'
 
 export const RecipesPage = () => {
@@ -52,7 +54,14 @@ export const RecipesPage = () => {
                   className="border-b border-gray-100 text-gray-900"
                   key={recipe.id}
                 >
-                  <td className="py-3 pr-4 font-medium">{recipe.title}</td>
+                  <td className="py-3 pr-4 font-medium">
+                    <Link
+                      className="font-bold text-gray-900 no-underline"
+                      to={`/recipes/${recipe.id}`}
+                    >
+                      {recipe.title}
+                    </Link>
+                  </td>
                   <td className="py-3 pr-4">
                     {recipe.calories_per_serving} kcal
                   </td>

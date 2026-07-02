@@ -15,10 +15,18 @@ export const useRecipesQuery = () => {
   })
 }
 
-export const useRecipeQuery = (recipeId: number) => {
+type RecipeQueryOptions = {
+  enabled?: boolean
+}
+
+export const useRecipeQuery = (
+  recipeId: number,
+  options: RecipeQueryOptions = {},
+) => {
   return useQuery({
     queryKey: recipeQueryKey(recipeId),
     queryFn: () => recipeService.getRecipe(recipeId),
+    enabled: options.enabled ?? true,
   })
 }
 
