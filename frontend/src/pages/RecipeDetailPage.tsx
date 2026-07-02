@@ -1,15 +1,38 @@
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 
-import { useRecipeQuery } from '../queries/recipeQueries'
+import type { Recipe } from '../api/types'
+import {
+  useDeleteRecipeMutation,
+  useRecipeQuery,
+} from '../queries/recipeQueries'
 
 export const RecipeDetailPage = () => {
+  const navigate = useNavigate()
   const { recipeId } = useParams()
   const parsedRecipeId = Number(recipeId)
   const isValidRecipeId = Number.isInteger(parsedRecipeId) && parsedRecipeId > 0
   const recipeQuery = useRecipeQuery(parsedRecipeId, {
     enabled: isValidRecipeId,
   })
+  const deleteRecipeMutation = useDeleteRecipeMutation()
   const recipe = recipeQuery.data
+
+  const handleDelete = (recipeToDelete: Recipe) => {
+    const shouldDelete = window.confirm(
+      `Delete ${recipeToDelete.title}? This cannot be undone.`,
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
+    deleteRecipeMutation.reset()
+    deleteRecipeMutation.mutate(recipeToDelete.id, {
+      onSuccess: () => {
+        navigate('/recipes')
+      },
+    })
+  }
 
   return (
     <section className="mx-auto max-w-5xl">
@@ -33,20 +56,38 @@ export const RecipeDetailPage = () => {
         </p>
       ) : null}
 
+      {deleteRecipeMutation.isError ? (
+        <p className="mt-8 text-red-600">
+          {deleteRecipeMutation.error instanceof Error
+            ? deleteRecipeMutation.error.message
+            : 'Unable to delete recipe'}
+        </p>
+      ) : null}
+
       {recipe ? (
         <>
-          <div className="mt-8 border-b border-gray-200 pb-6">
-            <p className="mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-              Recipe
-            </p>
-            <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-              {recipe.title}
-            </h1>
-            {recipe.description ? (
-              <p className="mt-4 max-w-3xl text-lg leading-8 text-gray-700">
-                {recipe.description}
+          <div className="mt-8 flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
+                Recipe
               </p>
-            ) : null}
+              <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
+                {recipe.title}
+              </h1>
+              {recipe.description ? (
+                <p className="mt-4 max-w-3xl text-lg leading-8 text-gray-700">
+                  {recipe.description}
+                </p>
+              ) : null}
+            </div>
+            <button
+              className="inline-flex cursor-pointer items-center justify-center rounded-md border-0 bg-red-600 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-red-300"
+              type="button"
+              disabled={deleteRecipeMutation.isPending}
+              onClick={() => handleDelete(recipe)}
+            >
+              {deleteRecipeMutation.isPending ? 'Deleting...' : 'Delete'}
+            </button>
           </div>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-3">
