@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NewIngredientPage } from './pages/NewIngredientPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { RecipeDetailPage } from './pages/RecipeDetailPage'
 import { RecipesPage } from './pages/RecipesPage'
 
 const App = () => {
@@ -47,6 +48,14 @@ const App = () => {
           element={
             <RequireAuth>
               <RecipesPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/recipes/:recipeId"
+          element={
+            <RequireAuth>
+              <RecipeDetailPage />
             </RequireAuth>
           }
         />
