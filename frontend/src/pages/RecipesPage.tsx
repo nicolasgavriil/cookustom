@@ -1,10 +1,28 @@
 import { Link } from 'react-router'
 
-import { useRecipesQuery } from '../queries/recipeQueries'
+import {
+  useDeleteRecipeMutation,
+  useRecipesQuery,
+} from '../queries/recipeQueries'
 
 export const RecipesPage = () => {
   const recipesQuery = useRecipesQuery()
+  const deleteRecipeMutation = useDeleteRecipeMutation()
   const recipes = recipesQuery.data ?? []
+  const deletingRecipeId = deleteRecipeMutation.variables ?? null
+
+  const handleDelete = (recipeId: number, recipeTitle: string) => {
+    const shouldDelete = window.confirm(
+      `Delete ${recipeTitle}? This cannot be undone.`,
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
+    deleteRecipeMutation.reset()
+    deleteRecipeMutation.mutate(recipeId)
+  }
 
   return (
     <section className="mx-auto max-w-5xl">
@@ -29,6 +47,14 @@ export const RecipesPage = () => {
         </p>
       ) : null}
 
+      {deleteRecipeMutation.isError ? (
+        <p className="mt-8 text-red-600">
+          {deleteRecipeMutation.error instanceof Error
+            ? deleteRecipeMutation.error.message
+            : 'Unable to delete recipe'}
+        </p>
+      ) : null}
+
       {recipesQuery.isSuccess && recipes.length === 0 ? (
         <p className="mt-8 text-gray-600">
           Your recipe collection is empty. Add recipes after setting up your
@@ -45,7 +71,8 @@ export const RecipesPage = () => {
                 <th className="py-3 pr-4 font-semibold">Per serving</th>
                 <th className="py-3 pr-4 font-semibold">Total calories</th>
                 <th className="py-3 pr-4 font-semibold">Servings</th>
-                <th className="py-3 font-semibold">Ingredients</th>
+                <th className="py-3 pr-4 font-semibold">Ingredients</th>
+                <th className="py-3 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -67,7 +94,23 @@ export const RecipesPage = () => {
                   </td>
                   <td className="py-3 pr-4">{recipe.total_calories} kcal</td>
                   <td className="py-3 pr-4">{recipe.base_servings}</td>
-                  <td className="py-3">{recipe.ingredients.length}</td>
+                  <td className="py-3 pr-4">{recipe.ingredients.length}</td>
+                  <td className="py-3">
+                    <button
+                      className="cursor-pointer border-0 bg-transparent p-0 font-bold text-red-600 disabled:cursor-not-allowed disabled:text-red-300"
+                      type="button"
+                      disabled={
+                        deleteRecipeMutation.isPending &&
+                        deletingRecipeId === recipe.id
+                      }
+                      onClick={() => handleDelete(recipe.id, recipe.title)}
+                    >
+                      {deleteRecipeMutation.isPending &&
+                      deletingRecipeId === recipe.id
+                        ? 'Deleting...'
+                        : 'Delete'}
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
