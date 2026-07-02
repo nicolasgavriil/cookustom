@@ -29,6 +29,12 @@ export const NavBar = () => {
             >
               Ingredients
             </Link>
+            <Link
+              className="font-bold text-gray-900 no-underline"
+              to="/recipes"
+            >
+              Recipes
+            </Link>
             <span className="font-medium text-gray-700">
               {currentUserQuery.data.email}
             </span>

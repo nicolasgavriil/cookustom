@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage'
 import { NewIngredientPage } from './pages/NewIngredientPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
+import { RecipesPage } from './pages/RecipesPage'
 
 const App = () => {
   return (
@@ -38,6 +39,14 @@ const App = () => {
           element={
             <RequireAuth>
               <EditIngredientPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/recipes"
+          element={
+            <RequireAuth>
+              <RecipesPage />
             </RequireAuth>
           }
         />
