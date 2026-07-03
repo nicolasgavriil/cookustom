@@ -1,6 +1,6 @@
 import { useFieldArray, useForm } from 'react-hook-form'
 
-import type { Ingredient, RecipeCreateRequest } from '../api/types'
+import type { Ingredient } from '../api/types'
 
 type RecipeIngredientFormValues = {
   ingredient_id: number
@@ -21,7 +21,7 @@ type RecipeFormProps = {
   submitLabel: string
   error: string | null
   isSubmitting: boolean
-  onSubmit: (request: RecipeCreateRequest) => void
+  onSubmit: (values: RecipeFormValues) => void
 }
 
 const emptyIngredientRow: RecipeIngredientFormValues = {
@@ -74,16 +74,7 @@ export const RecipeForm = ({
     }
 
     clearErrors('root.duplicateIngredients')
-    onSubmit({
-      title: values.title.trim(),
-      description: values.description.trim() || null,
-      base_servings: values.base_servings,
-      instructions: values.instructions.trim(),
-      ingredients: values.ingredients.map((ingredient) => ({
-        ingredient_id: ingredient.ingredient_id,
-        quantity: ingredient.quantity,
-      })),
-    })
+    onSubmit(values)
   }
 
   return (
@@ -138,6 +129,7 @@ export const RecipeForm = ({
           className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-blue-600"
           id="base_servings"
           min={1}
+          step={1}
           type="number"
           {...register('base_servings', {
             required: 'Base servings is required',
@@ -145,6 +137,8 @@ export const RecipeForm = ({
               value: 1,
               message: 'Base servings must be at least 1',
             },
+            validate: (value) =>
+              Number.isInteger(value) || 'Base servings must be a whole number',
             valueAsNumber: true,
           })}
         />
