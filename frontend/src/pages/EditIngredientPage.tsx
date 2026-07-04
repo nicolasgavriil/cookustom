@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router'
 
+import type { IngredientUpdateRequest } from '../api/types'
 import type { IngredientFormValues } from '../components/IngredientForm'
 import { IngredientForm } from '../components/IngredientForm'
 import {
@@ -26,9 +27,15 @@ export const EditIngredientPage = () => {
       return
     }
 
+    const request: IngredientUpdateRequest = {
+      name: values.name,
+      unit: values.unit,
+      calories_per_unit: values.calories_per_unit,
+    }
+
     updateIngredientMutation.reset()
     updateIngredientMutation.mutate(
-      { ingredientId: ingredient.id, request: values },
+      { ingredientId: ingredient.id, request },
       {
         onSuccess: () => {
           navigate('/ingredients')

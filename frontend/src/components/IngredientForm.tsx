@@ -37,18 +37,10 @@ export const IngredientForm = ({
     },
   })
 
-  const submitForm = (values: IngredientFormValues) => {
-    onSubmit({
-      name: values.name,
-      unit: values.unit,
-      calories_per_unit: values.calories_per_unit,
-    })
-  }
-
   return (
     <form
       className="mt-8 flex max-w-md flex-col gap-5"
-      onSubmit={handleSubmit(submitForm)}
+      onSubmit={handleSubmit(onSubmit)}
     >
       <div>
         <label className="mb-2 block font-medium text-gray-900" htmlFor="name">

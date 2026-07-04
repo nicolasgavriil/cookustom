@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router'
 
+import type { IngredientCreateRequest } from '../api/types'
 import type { IngredientFormValues } from '../components/IngredientForm'
 import { IngredientForm } from '../components/IngredientForm'
 import { useCreateIngredientMutation } from '../queries/ingredientQueries'
@@ -13,8 +14,14 @@ export const NewIngredientPage = () => {
       : null
 
   const handleSubmit = (values: IngredientFormValues) => {
+    const request: IngredientCreateRequest = {
+      name: values.name,
+      unit: values.unit,
+      calories_per_unit: values.calories_per_unit,
+    }
+
     createIngredientMutation.reset()
-    createIngredientMutation.mutate(values, {
+    createIngredientMutation.mutate(request, {
       onSuccess: () => {
         navigate('/ingredients')
       },
