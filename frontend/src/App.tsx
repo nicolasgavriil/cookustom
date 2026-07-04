@@ -4,6 +4,7 @@ import { NavBar } from './components/NavBar'
 import { RequireAuth } from './components/RequireAuth'
 import { DashboardPage } from './pages/DashboardPage'
 import { EditIngredientPage } from './pages/EditIngredientPage'
+import { EditRecipePage } from './pages/EditRecipePage'
 import { IngredientsPage } from './pages/IngredientsPage'
 import { LoginPage } from './pages/LoginPage'
 import { NewIngredientPage } from './pages/NewIngredientPage'
@@ -65,6 +66,14 @@ const App = () => {
           element={
             <RequireAuth>
               <RecipeDetailPage />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/recipes/:recipeId/edit"
+          element={
+            <RequireAuth>
+              <EditRecipePage />
             </RequireAuth>
           }
         />
