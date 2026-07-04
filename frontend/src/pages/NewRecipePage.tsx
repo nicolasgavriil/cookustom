@@ -1,10 +1,10 @@
 import { Link, useNavigate } from 'react-router'
 
-import type { RecipeCreateRequest } from '../api/types'
 import type { RecipeFormValues } from '../components/RecipeForm'
 import { RecipeForm } from '../components/RecipeForm'
 import { useIngredientsQuery } from '../queries/ingredientQueries'
 import { useCreateRecipeMutation } from '../queries/recipeQueries'
+import { toRecipeCreateRequest } from '../utils/recipeFormMappers'
 
 export const NewRecipePage = () => {
   const navigate = useNavigate()
@@ -17,19 +17,8 @@ export const NewRecipePage = () => {
       : null
 
   const handleSubmit = (values: RecipeFormValues) => {
-    const request: RecipeCreateRequest = {
-      title: values.title.trim(),
-      description: values.description.trim() || null,
-      base_servings: values.base_servings,
-      instructions: values.instructions.trim(),
-      ingredients: values.ingredients.map((ingredient) => ({
-        ingredient_id: ingredient.ingredient_id,
-        quantity: ingredient.quantity,
-      })),
-    }
-
     createRecipeMutation.reset()
-    createRecipeMutation.mutate(request, {
+    createRecipeMutation.mutate(toRecipeCreateRequest(values), {
       onSuccess: (recipe) => {
         navigate(`/recipes/${recipe.id}`)
       },

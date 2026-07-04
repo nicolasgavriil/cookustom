@@ -1,12 +1,15 @@
 import { Link, useNavigate, useParams } from 'react-router'
 
-import type { IngredientUpdateRequest } from '../api/types'
 import type { IngredientFormValues } from '../components/IngredientForm'
 import { IngredientForm } from '../components/IngredientForm'
 import {
   useIngredientsQuery,
   useUpdateIngredientMutation,
 } from '../queries/ingredientQueries'
+import {
+  toIngredientFormValues,
+  toIngredientUpdateRequest,
+} from '../utils/ingredientFormMappers'
 
 export const EditIngredientPage = () => {
   const navigate = useNavigate()
@@ -27,15 +30,9 @@ export const EditIngredientPage = () => {
       return
     }
 
-    const request: IngredientUpdateRequest = {
-      name: values.name,
-      unit: values.unit,
-      calories_per_unit: values.calories_per_unit,
-    }
-
     updateIngredientMutation.reset()
     updateIngredientMutation.mutate(
-      { ingredientId: ingredient.id, request },
+      { ingredientId: ingredient.id, request: toIngredientUpdateRequest(values) },
       {
         onSuccess: () => {
           navigate('/ingredients')
@@ -74,11 +71,7 @@ export const EditIngredientPage = () => {
 
       {ingredient ? (
         <IngredientForm
-          defaultValues={{
-            name: ingredient.name,
-            unit: ingredient.unit,
-            calories_per_unit: ingredient.calories_per_unit,
-          }}
+          defaultValues={toIngredientFormValues(ingredient)}
           submitLabel="Save ingredient"
           error={error}
           isSubmitting={updateIngredientMutation.isPending}

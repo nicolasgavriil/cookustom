@@ -1,6 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router'
 
-import type { Recipe, RecipeUpdateRequest } from '../api/types'
 import type { RecipeFormValues } from '../components/RecipeForm'
 import { RecipeForm } from '../components/RecipeForm'
 import { useIngredientsQuery } from '../queries/ingredientQueries'
@@ -8,6 +7,10 @@ import {
   useRecipeQuery,
   useUpdateRecipeMutation,
 } from '../queries/recipeQueries'
+import {
+  toRecipeFormValues,
+  toRecipeUpdateRequest,
+} from '../utils/recipeFormMappers'
 
 export const EditRecipePage = () => {
   const navigate = useNavigate()
@@ -31,20 +34,9 @@ export const EditRecipePage = () => {
       return
     }
 
-    const request: RecipeUpdateRequest = {
-      title: values.title.trim(),
-      description: values.description.trim() || null,
-      base_servings: values.base_servings,
-      instructions: values.instructions.trim(),
-      ingredients: values.ingredients.map((ingredient) => ({
-        ingredient_id: ingredient.ingredient_id,
-        quantity: ingredient.quantity,
-      })),
-    }
-
     updateRecipeMutation.reset()
     updateRecipeMutation.mutate(
-      { recipeId: recipe.id, request },
+      { recipeId: recipe.id, request: toRecipeUpdateRequest(values) },
       {
         onSuccess: (updatedRecipe) => {
           navigate(`/recipes/${updatedRecipe.id}`)
@@ -108,17 +100,4 @@ export const EditRecipePage = () => {
       ) : null}
     </section>
   )
-}
-
-const toRecipeFormValues = (recipe: Recipe): RecipeFormValues => {
-  return {
-    title: recipe.title,
-    description: recipe.description ?? '',
-    base_servings: recipe.base_servings,
-    instructions: recipe.instructions,
-    ingredients: recipe.ingredients.map((ingredient) => ({
-      ingredient_id: ingredient.ingredient_id,
-      quantity: ingredient.quantity,
-    })),
-  }
 }
