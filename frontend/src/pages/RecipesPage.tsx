@@ -104,20 +104,28 @@ export const RecipesPage = () => {
                   <td className="py-3 pr-4">{recipe.base_servings}</td>
                   <td className="py-3 pr-4">{recipe.ingredients.length}</td>
                   <td className="py-3">
-                    <button
-                      className="cursor-pointer border-0 bg-transparent p-0 font-bold text-red-600 disabled:cursor-not-allowed disabled:text-red-300"
-                      type="button"
-                      disabled={
-                        deleteRecipeMutation.isPending &&
+                    <div className="flex gap-4">
+                      <Link
+                        className="font-bold text-gray-900 no-underline"
+                        to={`/recipes/${recipe.id}/edit`}
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        className="cursor-pointer border-0 bg-transparent p-0 font-bold text-red-600 disabled:cursor-not-allowed disabled:text-red-300"
+                        type="button"
+                        disabled={
+                          deleteRecipeMutation.isPending &&
+                          deletingRecipeId === recipe.id
+                        }
+                        onClick={() => handleDelete(recipe.id, recipe.title)}
+                      >
+                        {deleteRecipeMutation.isPending &&
                         deletingRecipeId === recipe.id
-                      }
-                      onClick={() => handleDelete(recipe.id, recipe.title)}
-                    >
-                      {deleteRecipeMutation.isPending &&
-                      deletingRecipeId === recipe.id
-                        ? 'Deleting...'
-                        : 'Delete'}
-                    </button>
+                          ? 'Deleting...'
+                          : 'Delete'}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

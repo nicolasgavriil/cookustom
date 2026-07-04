@@ -80,14 +80,22 @@ export const RecipeDetailPage = () => {
                 </p>
               ) : null}
             </div>
-            <button
-              className="inline-flex cursor-pointer items-center justify-center rounded-md border-0 bg-red-600 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-red-300"
-              type="button"
-              disabled={deleteRecipeMutation.isPending}
-              onClick={() => handleDelete(recipe)}
-            >
-              {deleteRecipeMutation.isPending ? 'Deleting...' : 'Delete'}
-            </button>
+            <div className="flex gap-3">
+              <Link
+                className="inline-flex items-center justify-center rounded-md bg-gray-900 px-4 py-2 font-semibold text-white no-underline"
+                to={`/recipes/${recipe.id}/edit`}
+              >
+                Edit
+              </Link>
+              <button
+                className="inline-flex cursor-pointer items-center justify-center rounded-md border-0 bg-red-600 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-red-300"
+                type="button"
+                disabled={deleteRecipeMutation.isPending}
+                onClick={() => handleDelete(recipe)}
+              >
+                {deleteRecipeMutation.isPending ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
           </div>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-3">
