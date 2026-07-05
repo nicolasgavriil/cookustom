@@ -1,6 +1,5 @@
-import { API_BASE_URL } from '../api/config'
+import { fetchApiJson } from '../api/fetchApi'
 import type {
-  ApiErrorResponse,
   LoginRequest,
   TokenResponse,
   User,
@@ -13,7 +12,7 @@ const jsonHeaders = {
 }
 
 export async function register(request: UserCreateRequest): Promise<User> {
-  return fetchJson<User>('/auth/register', {
+  return fetchApiJson<User>('/auth/register', {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify(request),
@@ -21,7 +20,7 @@ export async function register(request: UserCreateRequest): Promise<User> {
 }
 
 export async function login(request: LoginRequest): Promise<TokenResponse> {
-  return fetchJson<TokenResponse>('/auth/login', {
+  return fetchApiJson<TokenResponse>('/auth/login', {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify(request),
@@ -35,7 +34,7 @@ export async function getCurrentUser(): Promise<User | null> {
     return null
   }
 
-  return fetchJson<User>('/auth/me', {
+  return fetchApiJson<User>('/auth/me', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -44,23 +43,4 @@ export async function getCurrentUser(): Promise<User | null> {
 
 export function logout(): void {
   tokenStorage.clearAccessToken()
-}
-
-async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, init)
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response))
-  }
-
-  return response.json() as Promise<T>
-}
-
-async function getErrorMessage(response: Response): Promise<string> {
-  try {
-    const error = (await response.json()) as ApiErrorResponse
-    return error.detail || 'Request failed'
-  } catch {
-    return 'Request failed'
-  }
 }

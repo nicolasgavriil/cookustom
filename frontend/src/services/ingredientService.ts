@@ -1,6 +1,5 @@
-import { API_BASE_URL } from '../api/config'
+import { fetchApi, fetchApiJson } from '../api/fetchApi'
 import type {
-  ApiErrorResponse,
   Ingredient,
   IngredientCreateRequest,
   IngredientUpdateRequest,
@@ -8,59 +7,37 @@ import type {
 import { tokenStorage } from '../utils/tokenStorage'
 
 export async function listIngredients(): Promise<Ingredient[]> {
-  const response = await fetch(`${API_BASE_URL}/ingredients`, {
+  return fetchApiJson<Ingredient[]>('/ingredients', {
     headers: getAuthHeaders(),
   })
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response))
-  }
-
-  return response.json() as Promise<Ingredient[]>
 }
 
 export async function createIngredient(
   request: IngredientCreateRequest,
 ): Promise<Ingredient> {
-  const response = await fetch(`${API_BASE_URL}/ingredients`, {
+  return fetchApiJson<Ingredient>('/ingredients', {
     method: 'POST',
     headers: getJsonAuthHeaders(),
     body: JSON.stringify(request),
   })
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response))
-  }
-
-  return response.json() as Promise<Ingredient>
 }
 
 export async function updateIngredient(
   ingredientId: number,
   request: IngredientUpdateRequest,
 ): Promise<Ingredient> {
-  const response = await fetch(`${API_BASE_URL}/ingredients/${ingredientId}`, {
+  return fetchApiJson<Ingredient>(`/ingredients/${ingredientId}`, {
     method: 'PUT',
     headers: getJsonAuthHeaders(),
     body: JSON.stringify(request),
   })
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response))
-  }
-
-  return response.json() as Promise<Ingredient>
 }
 
 export async function deleteIngredient(ingredientId: number): Promise<void> {
-  const response = await fetch(`${API_BASE_URL}/ingredients/${ingredientId}`, {
+  await fetchApi(`/ingredients/${ingredientId}`, {
     method: 'DELETE',
     headers: getAuthHeaders(),
   })
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response))
-  }
 }
 
 function getAuthHeaders(): Headers {
@@ -78,13 +55,4 @@ function getJsonAuthHeaders(): Headers {
   const headers = getAuthHeaders()
   headers.set('Content-Type', 'application/json')
   return headers
-}
-
-async function getErrorMessage(response: Response): Promise<string> {
-  try {
-    const error = (await response.json()) as ApiErrorResponse
-    return error.detail || 'Request failed'
-  } catch {
-    return 'Request failed'
-  }
 }
