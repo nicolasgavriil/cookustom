@@ -1,84 +1,33 @@
-export type User = {
-  id: number
-  email: string
-  created_at: string
-}
+// Frontend-facing facade over generated OpenAPI types.
+// App code should import from this file instead of importing generated files directly.
+import type {
+  IngredientResponse,
+  RecipeIngredientCreateRequest,
+  RecipeIngredientResponse,
+  RecipeResponse,
+  TokenResponse as GeneratedTokenResponse,
+  UserResponse,
+} from './generated'
 
-export type UserCreateRequest = {
-  email: string
-  password: string
-}
+export type {
+  IngredientCreateRequest,
+  IngredientUpdateRequest,
+  LoginRequest,
+  RecipeCreateRequest,
+  RecipeUpdateRequest,
+  UserCreateRequest,
+} from './generated'
 
-export type LoginRequest = {
-  email: string
-  password: string
-}
+export type User = UserResponse
 
-export type TokenResponse = {
-  access_token: string
-  token_type: 'bearer'
-}
+export type TokenResponse = GeneratedTokenResponse
 
-export type IngredientUnit = 'g' | 'ml' | 'piece'
+export type IngredientUnit = IngredientResponse['unit']
 
-export type Ingredient = {
-  id: number
-  user_id: number
-  name: string
-  unit: IngredientUnit
-  calories_per_unit: string
-  created_at: string
-}
+export type Ingredient = IngredientResponse
 
-export type IngredientCreateRequest = {
-  name: string
-  unit: IngredientUnit
-  calories_per_unit: string
-}
+export type RecipeIngredient = RecipeIngredientResponse
 
-export type IngredientUpdateRequest = {
-  name: string
-  unit: IngredientUnit
-  calories_per_unit: string
-}
+export type Recipe = RecipeResponse
 
-export type RecipeIngredient = {
-  ingredient_id: number
-  ingredient_name: string
-  unit: IngredientUnit
-  quantity: string
-  calories_per_unit: string
-  calories: number
-}
-
-export type Recipe = {
-  id: number
-  parent_recipe_id: number | null
-  title: string
-  description: string | null
-  base_servings: number
-  instructions: string
-  created_at: string
-  ingredients: RecipeIngredient[]
-  total_calories: number
-  calories_per_serving: number
-}
-
-export type RecipeIngredientRequest = {
-  ingredient_id: number
-  quantity: string
-}
-
-export type RecipeCreateRequest = {
-  title: string
-  description: string | null
-  base_servings: number
-  instructions: string
-  ingredients: RecipeIngredientRequest[]
-}
-
-export type RecipeUpdateRequest = RecipeCreateRequest
-
-export type ApiErrorResponse = {
-  detail: string
-}
+export type RecipeIngredientRequest = RecipeIngredientCreateRequest

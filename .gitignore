@@ -42,6 +42,7 @@ frontend/.env
 frontend/.env.*
 !frontend/.env.example
 !frontend/.env.*.example
+frontend/src/api/generated/openapi.json
 
 # Package manager caches
 .pnpm-store/
@@ -72,7 +73,3 @@ docker-data/
 tmp/
 *.sqlite
 *.sqlite3
-
-# Generated API types
-# Keep this commented until the frontend generation path is finalized.
-# frontend/src/api/schema.d.ts
