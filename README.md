@@ -117,3 +117,13 @@ Run frontend checks:
 pnpm lint
 pnpm build
 ```
+
+Generate frontend API types from the FastAPI OpenAPI schema:
+
+```bash
+pnpm generate:api-types
+```
+
+This imports the backend FastAPI app, writes the OpenAPI schema, and regenerates
+the TypeScript types used by the frontend. API calls are still implemented by
+manual service functions.

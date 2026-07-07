@@ -1,6 +1,8 @@
-import type { ApiErrorResponse } from './types'
-
 const fallbackErrorMessage = 'Request failed'
+
+type ApiErrorResponse = {
+  detail?: unknown
+}
 
 export const getApiErrorMessage = async (
   response: Response,
