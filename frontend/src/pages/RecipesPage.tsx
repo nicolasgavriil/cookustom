@@ -102,7 +102,7 @@ export const RecipesPage = () => {
                   </td>
                   <td className="py-3 pr-4">{recipe.total_calories} kcal</td>
                   <td className="py-3 pr-4">{recipe.base_servings}</td>
-                  <td className="py-3 pr-4">{recipe.ingredients.length}</td>
+                  <td className="py-3 pr-4">{recipe.ingredient_count}</td>
                   <td className="py-3">
                     <div className="flex gap-4">
                       <Link
