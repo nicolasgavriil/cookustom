@@ -10,12 +10,17 @@ from app.db.database import get_db
 from app.models.ingredient import Ingredient
 from app.models.recipe import Recipe, RecipeIngredient
 from app.models.user import User
-from app.schemas.recipe import RecipeCreateRequest, RecipeResponse, RecipeUpdateRequest
+from app.schemas.recipe import (
+    RecipeCreateRequest,
+    RecipeResponse,
+    RecipeSummaryResponse,
+    RecipeUpdateRequest,
+)
 
 router = APIRouter(prefix="/recipes", tags=["recipes"])
 
 
-@router.get("", response_model=list[RecipeResponse])
+@router.get("", response_model=list[RecipeSummaryResponse])
 async def list_recipes(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],

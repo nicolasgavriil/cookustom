@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from fastapi.testclient import TestClient
 
 from tests.conftest import login_user, register_user
@@ -56,10 +54,6 @@ def create_recipe(
     return response.json()
 
 
-def assert_decimal_equal(value: str, expected: str) -> None:
-    assert Decimal(value) == Decimal(expected)
-
-
 def test_list_recipes_returns_empty_list_for_new_user(client: TestClient) -> None:
     register_user(client)
     token = login_user(client)
@@ -90,7 +84,7 @@ def test_list_recipes_returns_current_users_recipes(client: TestClient) -> None:
     assert data[0]["title"] == "Rice bowl"
 
 
-def test_list_recipes_includes_nested_ingredients_and_calories(
+def test_list_recipes_returns_summary_with_calories(
     client: TestClient,
 ) -> None:
     register_user(client)
@@ -124,6 +118,7 @@ def test_list_recipes_includes_nested_ingredients_and_calories(
         },
     )
     assert create_response.status_code == 201
+    created_recipe = create_response.json()
 
     response = client.get("/recipes", headers=auth_headers(token))
 
@@ -131,25 +126,15 @@ def test_list_recipes_includes_nested_ingredients_and_calories(
     data = response.json()
     assert len(data) == 1
     recipe = data[0]
-    assert recipe["title"] == "Rice bowl"
-    assert recipe["total_calories"] == 270
-    assert recipe["calories_per_serving"] == 135
-
-    rice_response = recipe["ingredients"][0]
-    assert rice_response["ingredient_id"] == rice["id"]
-    assert rice_response["ingredient_name"] == "Rice"
-    assert rice_response["unit"] == "g"
-    assert_decimal_equal(rice_response["quantity"], "100")
-    assert_decimal_equal(rice_response["calories_per_unit"], "1.3")
-    assert rice_response["calories"] == 130
-
-    egg_response = recipe["ingredients"][1]
-    assert egg_response["ingredient_id"] == egg["id"]
-    assert egg_response["ingredient_name"] == "Egg"
-    assert egg_response["unit"] == "piece"
-    assert_decimal_equal(egg_response["quantity"], "2")
-    assert_decimal_equal(egg_response["calories_per_unit"], "70")
-    assert egg_response["calories"] == 140
+    assert recipe == {
+        "id": created_recipe["id"],
+        "title": "Rice bowl",
+        "description": None,
+        "base_servings": 2,
+        "created_at": created_recipe["created_at"],
+        "total_calories": 270,
+        "calories_per_serving": 135,
+    }
 
 
 def test_list_recipes_returns_newest_recipe_first(client: TestClient) -> None:

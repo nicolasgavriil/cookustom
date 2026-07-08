@@ -74,22 +74,25 @@ class RecipeIngredientResponse(BaseModel):
         return round(value)
 
 
-class RecipeResponse(BaseModel):
+class RecipeSummaryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
-    parent_recipe_id: int | None
     title: str
     description: str | None
     base_servings: int
-    instructions: str
     created_at: datetime
-    ingredients: list[RecipeIngredientResponse] = Field(
-        validation_alias="recipe_ingredients"
-    )
     total_calories: Decimal
     calories_per_serving: Decimal
 
     @field_serializer("total_calories", "calories_per_serving")
     def serialize_calories(self, value: Decimal) -> int:
         return round(value)
+
+
+class RecipeResponse(RecipeSummaryResponse):
+    parent_recipe_id: int | None
+    instructions: str
+    ingredients: list[RecipeIngredientResponse] = Field(
+        validation_alias="recipe_ingredients"
+    )
