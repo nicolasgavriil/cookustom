@@ -65,6 +65,10 @@ class Recipe(Base):
         )
 
     @property
+    def ingredient_count(self) -> int:
+        return len(self.recipe_ingredients)
+
+    @property
     def calories_per_serving(self) -> Decimal:
         return self.total_calories / Decimal(self.base_servings)
 

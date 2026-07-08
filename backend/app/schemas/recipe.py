@@ -81,6 +81,7 @@ class RecipeSummaryResponse(BaseModel):
     title: str
     description: str | None
     base_servings: int
+    ingredient_count: int
     created_at: datetime
     total_calories: Decimal
     calories_per_serving: Decimal

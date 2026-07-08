@@ -5,6 +5,7 @@ import type {
   RecipeIngredientCreateRequest,
   RecipeIngredientResponse,
   RecipeResponse,
+  RecipeSummaryResponse,
   TokenResponse as GeneratedTokenResponse,
   UserResponse,
 } from './generated'
@@ -29,5 +30,7 @@ export type Ingredient = IngredientResponse
 export type RecipeIngredient = RecipeIngredientResponse
 
 export type Recipe = RecipeResponse
+
+export type RecipeSummary = RecipeSummaryResponse
 
 export type RecipeIngredientRequest = RecipeIngredientCreateRequest

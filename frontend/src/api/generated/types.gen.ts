@@ -189,6 +189,10 @@ export type RecipeResponse = {
      */
     id: number;
     /**
+     * Ingredient Count
+     */
+    ingredient_count: number;
+    /**
      * Ingredients
      */
     ingredients: Array<RecipeIngredientResponse>;
@@ -200,6 +204,44 @@ export type RecipeResponse = {
      * Parent Recipe Id
      */
     parent_recipe_id: number | null;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Total Calories
+     */
+    total_calories: number;
+};
+
+/**
+ * RecipeSummaryResponse
+ */
+export type RecipeSummaryResponse = {
+    /**
+     * Base Servings
+     */
+    base_servings: number;
+    /**
+     * Calories Per Serving
+     */
+    calories_per_serving: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Ingredient Count
+     */
+    ingredient_count: number;
     /**
      * Title
      */
@@ -512,7 +554,7 @@ export type ListRecipesRecipesGetResponses = {
      *
      * Successful Response
      */
-    200: Array<RecipeResponse>;
+    200: Array<RecipeSummaryResponse>;
 };
 
 export type ListRecipesRecipesGetResponse = ListRecipesRecipesGetResponses[keyof ListRecipesRecipesGetResponses];

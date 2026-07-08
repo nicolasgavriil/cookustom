@@ -131,6 +131,7 @@ def test_list_recipes_returns_summary_with_calories(
         "title": "Rice bowl",
         "description": None,
         "base_servings": 2,
+        "ingredient_count": 2,
         "created_at": created_recipe["created_at"],
         "total_calories": 270,
         "calories_per_serving": 135,

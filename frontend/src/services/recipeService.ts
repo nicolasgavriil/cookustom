@@ -2,12 +2,13 @@ import { fetchApi, fetchApiJson } from '../api/fetchApi'
 import type {
   Recipe,
   RecipeCreateRequest,
+  RecipeSummary,
   RecipeUpdateRequest,
 } from '../api/types'
 import { tokenStorage } from '../utils/tokenStorage'
 
-export async function listRecipes(): Promise<Recipe[]> {
-  return fetchApiJson<Recipe[]>('/recipes', {
+export async function listRecipes(): Promise<RecipeSummary[]> {
+  return fetchApiJson<RecipeSummary[]>('/recipes', {
     headers: getAuthHeaders(),
   })
 }
