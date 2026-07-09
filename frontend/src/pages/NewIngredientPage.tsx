@@ -1,7 +1,10 @@
-import { Link, useNavigate } from 'react-router'
+import { ArrowLeft, Carrot } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 import type { IngredientFormValues } from '../components/IngredientForm'
 import { IngredientForm } from '../components/IngredientForm'
+import { ButtonLink } from '../components/ui/Button'
+import { PageHeader } from '../components/ui/PageHeader'
 import { useCreateIngredientMutation } from '../queries/ingredientQueries'
 import { toIngredientCreateRequest } from '../utils/ingredientFormMappers'
 
@@ -23,19 +26,22 @@ export const NewIngredientPage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <Link className="font-bold text-gray-900 no-underline" to="/ingredients">
+    <section className="max-w-2xl">
+      <ButtonLink
+        icon={<ArrowLeft className="size-4" aria-hidden="true" />}
+        variant="ghost"
+        to="/ingredients"
+      >
         Back to ingredients
-      </Link>
-      <p className="mt-8 mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-        Ingredients
-      </p>
-      <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-        Add ingredient
-      </h1>
-      <p className="mt-6 text-lg leading-8 text-gray-600">
-        Add a reusable ingredient with calories per gram, milliliter, or piece.
-      </p>
+      </ButtonLink>
+      <div className="mt-6">
+        <PageHeader
+          eyebrow="Ingredients"
+          title="Add ingredient"
+          description="Add a reusable ingredient with calories per gram, milliliter, or piece."
+          icon={<Carrot className="size-6" aria-hidden="true" />}
+        />
+      </div>
       <IngredientForm
         submitLabel="Create ingredient"
         error={error}

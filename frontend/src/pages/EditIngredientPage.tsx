@@ -1,7 +1,11 @@
-import { Link, useNavigate, useParams } from 'react-router'
+import { ArrowLeft, Carrot } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router'
 
 import type { IngredientFormValues } from '../components/IngredientForm'
 import { IngredientForm } from '../components/IngredientForm'
+import { ButtonLink } from '../components/ui/Button'
+import { PageHeader } from '../components/ui/PageHeader'
+import { StatusMessage } from '../components/ui/StatusMessage'
 import {
   useIngredientsQuery,
   useUpdateIngredientMutation,
@@ -42,31 +46,36 @@ export const EditIngredientPage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <Link className="font-bold text-gray-900 no-underline" to="/ingredients">
+    <section className="max-w-2xl">
+      <ButtonLink
+        icon={<ArrowLeft className="size-4" aria-hidden="true" />}
+        variant="ghost"
+        to="/ingredients"
+      >
         Back to ingredients
-      </Link>
-      <p className="mt-8 mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-        Ingredients
-      </p>
-      <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-        Edit ingredient
-      </h1>
+      </ButtonLink>
+      <div className="mt-6">
+        <PageHeader
+          eyebrow="Ingredients"
+          title="Edit ingredient"
+          icon={<Carrot className="size-6" aria-hidden="true" />}
+        />
+      </div>
 
       {ingredientsQuery.isPending ? (
-        <p className="mt-8 text-gray-600">Loading ingredient...</p>
+        <StatusMessage loading>Loading ingredient...</StatusMessage>
       ) : null}
 
       {ingredientsQuery.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {ingredientsQuery.error instanceof Error
             ? ingredientsQuery.error.message
             : 'Unable to load ingredient'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {ingredientsQuery.isSuccess && !ingredient ? (
-        <p className="mt-8 text-gray-600">Ingredient not found.</p>
+        <StatusMessage>Ingredient not found.</StatusMessage>
       ) : null}
 
       {ingredient ? (

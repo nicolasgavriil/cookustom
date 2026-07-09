@@ -16,72 +16,74 @@ import { RecipesPage } from './pages/RecipesPage'
 
 const App = () => {
   return (
-    <main className="min-h-screen px-6 py-12 sm:px-8">
+    <div className="min-h-screen">
       <NavBar />
 
-      <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route
-          path="/ingredients"
-          element={
-            <RequireAuth>
-              <IngredientsPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/ingredients/new"
-          element={
-            <RequireAuth>
-              <NewIngredientPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/ingredients/:ingredientId/edit"
-          element={
-            <RequireAuth>
-              <EditIngredientPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/recipes"
-          element={
-            <RequireAuth>
-              <RecipesPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/recipes/new"
-          element={
-            <RequireAuth>
-              <NewRecipePage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/recipes/:recipeId"
-          element={
-            <RequireAuth>
-              <RecipeDetailPage />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/recipes/:recipeId/edit"
-          element={
-            <RequireAuth>
-              <EditRecipePage />
-            </RequireAuth>
-          }
-        />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </main>
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <Routes>
+          <Route path="/" element={<DashboardPage />} />
+          <Route
+            path="/ingredients"
+            element={
+              <RequireAuth>
+                <IngredientsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/ingredients/new"
+            element={
+              <RequireAuth>
+                <NewIngredientPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/ingredients/:ingredientId/edit"
+            element={
+              <RequireAuth>
+                <EditIngredientPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes"
+            element={
+              <RequireAuth>
+                <RecipesPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes/new"
+            element={
+              <RequireAuth>
+                <NewRecipePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes/:recipeId"
+            element={
+              <RequireAuth>
+                <RecipeDetailPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes/:recipeId/edit"
+            element={
+              <RequireAuth>
+                <EditRecipePage />
+              </RequireAuth>
+            }
+          />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+    </div>
   )
 }
 
