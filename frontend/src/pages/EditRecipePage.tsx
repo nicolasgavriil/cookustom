@@ -1,7 +1,11 @@
-import { Link, useNavigate, useParams } from 'react-router'
+import { ArrowLeft, BookOpen } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router'
 
 import type { RecipeFormValues } from '../components/RecipeForm'
 import { RecipeForm } from '../components/RecipeForm'
+import { ButtonLink } from '../components/ui/Button'
+import { PageHeader } from '../components/ui/PageHeader'
+import { StatusMessage } from '../components/ui/StatusMessage'
 import { useIngredientsQuery } from '../queries/ingredientQueries'
 import {
   useRecipeQuery,
@@ -46,47 +50,52 @@ export const EditRecipePage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-3xl">
-      <Link className="font-bold text-gray-900 no-underline" to="/recipes">
+    <section>
+      <ButtonLink
+        icon={<ArrowLeft className="size-4" aria-hidden="true" />}
+        variant="ghost"
+        to="/recipes"
+      >
         Back to recipes
-      </Link>
+      </ButtonLink>
 
       {!isValidRecipeId ? (
-        <p className="mt-8 text-gray-600">Recipe not found.</p>
+        <StatusMessage>Recipe not found.</StatusMessage>
       ) : null}
 
       {recipeQuery.isPending && isValidRecipeId ? (
-        <p className="mt-8 text-gray-600">Loading recipe...</p>
+        <StatusMessage loading>Loading recipe...</StatusMessage>
       ) : null}
 
       {recipeQuery.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {recipeQuery.error instanceof Error
             ? recipeQuery.error.message
             : 'Unable to load recipe'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {ingredientsQuery.isPending ? (
-        <p className="mt-8 text-gray-600">Loading ingredients...</p>
+        <StatusMessage loading>Loading ingredients...</StatusMessage>
       ) : null}
 
       {ingredientsQuery.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {ingredientsQuery.error instanceof Error
             ? ingredientsQuery.error.message
             : 'Unable to load ingredients'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {recipe && ingredientsQuery.isSuccess ? (
         <>
-          <p className="mt-8 mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-            Recipes
-          </p>
-          <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-            Edit recipe
-          </h1>
+          <div className="mt-6 max-w-4xl">
+            <PageHeader
+              eyebrow="Recipes"
+              title="Edit recipe"
+              icon={<BookOpen className="size-6" aria-hidden="true" />}
+            />
+          </div>
           <RecipeForm
             availableIngredients={ingredients}
             defaultValues={toRecipeFormValues(recipe)}

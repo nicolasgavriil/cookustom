@@ -1,7 +1,11 @@
-import { Link, useNavigate } from 'react-router'
+import { ArrowLeft, BookOpen } from 'lucide-react'
+import { useNavigate } from 'react-router'
 
 import type { RecipeFormValues } from '../components/RecipeForm'
 import { RecipeForm } from '../components/RecipeForm'
+import { ButtonLink } from '../components/ui/Button'
+import { PageHeader } from '../components/ui/PageHeader'
+import { StatusMessage } from '../components/ui/StatusMessage'
 import { useIngredientsQuery } from '../queries/ingredientQueries'
 import { useCreateRecipeMutation } from '../queries/recipeQueries'
 import { toRecipeCreateRequest } from '../utils/recipeFormMappers'
@@ -26,37 +30,37 @@ export const NewRecipePage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-3xl">
-      <Link className="font-bold text-gray-900 no-underline" to="/recipes">
+    <section>
+      <ButtonLink
+        icon={<ArrowLeft className="size-4" aria-hidden="true" />}
+        variant="ghost"
+        to="/recipes"
+      >
         Back to recipes
-      </Link>
-      <p className="mt-8 mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-        Recipes
-      </p>
-      <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-        Add recipe
-      </h1>
-      <p className="mt-6 text-lg leading-8 text-gray-600">
-        Build a recipe from your ingredient library and calculate calories per
-        serving.
-      </p>
+      </ButtonLink>
+      <div className="mt-6 max-w-4xl">
+        <PageHeader
+          eyebrow="Recipes"
+          title="Add recipe"
+          description="Build a recipe from your ingredient library and calculate calories per serving."
+          icon={<BookOpen className="size-6" aria-hidden="true" />}
+        />
+      </div>
 
       {ingredientsQuery.isPending ? (
-        <p className="mt-8 text-gray-600">Loading ingredients...</p>
+        <StatusMessage loading>Loading ingredients...</StatusMessage>
       ) : null}
 
       {ingredientsQuery.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {ingredientsQuery.error instanceof Error
             ? ingredientsQuery.error.message
             : 'Unable to load ingredients'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {ingredientsQuery.isSuccess && ingredients.length === 0 ? (
-        <p className="mt-8 text-gray-600">
-          Add ingredients before creating recipes.
-        </p>
+        <StatusMessage>Add ingredients before creating recipes.</StatusMessage>
       ) : null}
 
       {ingredients.length > 0 ? (

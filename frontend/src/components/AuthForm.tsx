@@ -1,5 +1,7 @@
 import type { SyntheticEvent } from 'react'
 
+import { Button } from './ui/Button'
+
 type AuthFormProps = {
   submitLabel: string
   error: string | null
@@ -28,13 +30,16 @@ export const AuthForm = ({
   }
 
   return (
-    <form className="mt-8 flex max-w-md flex-col gap-5" onSubmit={handleSubmit}>
+    <form
+      className="mt-8 flex max-w-md flex-col gap-5 rounded-lg border border-stone-200 bg-white/85 p-5 shadow-sm sm:p-6"
+      onSubmit={handleSubmit}
+    >
       <div>
-        <label className="mb-2 block font-medium text-gray-900" htmlFor="email">
+        <label className="mb-2 block font-medium text-stone-900" htmlFor="email">
           Email
         </label>
         <input
-          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-blue-600"
+          className="w-full rounded-md border border-stone-300 bg-white px-3 py-2.5 text-stone-950 outline-emerald-700 focus:border-emerald-700"
           id="email"
           name="email"
           type="email"
@@ -45,13 +50,13 @@ export const AuthForm = ({
 
       <div>
         <label
-          className="mb-2 block font-medium text-gray-900"
+          className="mb-2 block font-medium text-stone-900"
           htmlFor="password"
         >
           Password
         </label>
         <input
-          className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 outline-blue-600"
+          className="w-full rounded-md border border-stone-300 bg-white px-3 py-2.5 text-stone-950 outline-emerald-700 focus:border-emerald-700"
           id="password"
           name="password"
           type="password"
@@ -62,15 +67,11 @@ export const AuthForm = ({
         />
       </div>
 
-      {error ? <p className="m-0 text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="m-0 text-sm text-rose-700">{error}</p> : null}
 
-      <button
-        className="rounded-md bg-blue-600 px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:bg-blue-300"
-        type="submit"
-        disabled={isSubmitting}
-      >
+      <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Please wait...' : submitLabel}
-      </button>
+      </Button>
     </form>
   )
 }

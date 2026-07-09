@@ -1,6 +1,8 @@
+import { UserPlus } from 'lucide-react'
 import { useNavigate } from 'react-router'
 
 import { AuthForm } from '../components/AuthForm'
+import { PageHeader } from '../components/ui/PageHeader'
 import { useRegisterMutation } from '../queries/authQueries'
 
 export const RegisterPage = () => {
@@ -24,16 +26,13 @@ export const RegisterPage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-2xl">
-      <p className="mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-        Auth
-      </p>
-      <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-7xl">
-        Create account
-      </h1>
-      <p className="mt-6 text-lg leading-8 text-gray-600">
-        Create an account to start building your ingredient and recipe library.
-      </p>
+    <section className="max-w-2xl">
+      <PageHeader
+        eyebrow="Auth"
+        title="Create account"
+        description="Create an account to start building your ingredient and recipe library."
+        icon={<UserPlus className="size-6" aria-hidden="true" />}
+      />
       <AuthForm
         submitLabel="Create account"
         error={authError}

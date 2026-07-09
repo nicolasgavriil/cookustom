@@ -1,15 +1,22 @@
+import { BookOpen, Plus } from 'lucide-react'
 import { Link } from 'react-router'
 
 import {
   useDeleteRecipeMutation,
   useRecipesQuery,
 } from '../queries/recipeQueries'
+import { ButtonLink } from '../components/ui/Button'
+import { EmptyState } from '../components/ui/EmptyState'
+import { PageHeader } from '../components/ui/PageHeader'
+import { StatusMessage } from '../components/ui/StatusMessage'
 
 export const RecipesPage = () => {
   const recipesQuery = useRecipesQuery()
   const deleteRecipeMutation = useDeleteRecipeMutation()
   const recipes = recipesQuery.data ?? []
   const deletingRecipeId = deleteRecipeMutation.variables ?? null
+  const recipeCountLabel =
+    recipes.length === 1 ? '1 recipe' : `${recipes.length} recipes`
 
   const handleDelete = (recipeId: number, recipeTitle: string) => {
     const shouldDelete = window.confirm(
@@ -25,94 +32,126 @@ export const RecipesPage = () => {
   }
 
   return (
-    <section className="mx-auto max-w-5xl">
-      <div className="flex flex-col gap-4 border-b border-gray-200 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="mb-3 text-sm font-bold tracking-widest text-blue-600 uppercase">
-            Recipes
-          </p>
-          <h1 className="m-0 text-4xl leading-none text-gray-900 sm:text-6xl">
-            Recipe collection
-          </h1>
-        </div>
-        <Link
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 font-semibold text-white no-underline"
-          to="/recipes/new"
-        >
-          Add recipe
-        </Link>
-      </div>
+    <section>
+      <PageHeader
+        eyebrow="Recipes"
+        title="Recipe collection"
+        description={
+          recipes.length > 0
+            ? recipeCountLabel
+            : 'Build a personal library of meals you cook and want to revisit.'
+        }
+        icon={<BookOpen className="size-6" aria-hidden="true" />}
+        actions={
+          <ButtonLink
+            icon={<Plus className="size-4" aria-hidden="true" />}
+            to="/recipes/new"
+          >
+            Add recipe
+          </ButtonLink>
+        }
+      />
 
       {recipesQuery.isPending ? (
-        <p className="mt-8 text-gray-600">Loading recipes...</p>
+        <StatusMessage loading>Loading recipes...</StatusMessage>
       ) : null}
 
       {recipesQuery.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {recipesQuery.error instanceof Error
             ? recipesQuery.error.message
             : 'Unable to load recipes'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {deleteRecipeMutation.isError ? (
-        <p className="mt-8 text-red-600">
+        <StatusMessage tone="danger">
           {deleteRecipeMutation.error instanceof Error
             ? deleteRecipeMutation.error.message
             : 'Unable to delete recipe'}
-        </p>
+        </StatusMessage>
       ) : null}
 
       {recipesQuery.isSuccess && recipes.length === 0 ? (
-        <p className="mt-8 text-gray-600">
-          Your recipe collection is empty. Add recipes after setting up your
-          ingredient library.
-        </p>
+        <EmptyState
+          icon={<BookOpen className="size-6" aria-hidden="true" />}
+          title="No recipes yet"
+          description="Add recipes after setting up your ingredient library."
+          action={
+            <ButtonLink
+              icon={<Plus className="size-4" aria-hidden="true" />}
+              to="/recipes/new"
+            >
+              Add recipe
+            </ButtonLink>
+          }
+        />
       ) : null}
 
       {recipes.length > 0 ? (
-        <div className="mt-8 overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+        <div className="mt-8 overflow-x-auto rounded-lg border border-stone-200 bg-white/85 shadow-sm">
+          <table className="w-full min-w-[48rem] border-collapse text-left">
             <thead>
-              <tr className="border-b border-gray-200 text-sm text-gray-600">
-                <th className="py-3 pr-4 font-semibold">Title</th>
-                <th className="py-3 pr-4 font-semibold">Per serving</th>
-                <th className="py-3 pr-4 font-semibold">Total calories</th>
-                <th className="py-3 pr-4 font-semibold">Servings</th>
-                <th className="py-3 pr-4 font-semibold">Ingredients</th>
-                <th className="py-3 font-semibold">Actions</th>
+              <tr className="border-b border-stone-200 bg-stone-100/80 text-xs font-bold tracking-wider text-stone-600 uppercase">
+                <th className="py-3 pr-4 pl-3 font-semibold">Recipe</th>
+                <th className="py-3 pr-4 text-right font-semibold">
+                  Per serving
+                </th>
+                <th className="py-3 pr-4 text-right font-semibold">
+                  Total
+                </th>
+                <th className="py-3 pr-4 text-right font-semibold">
+                  Servings
+                </th>
+                <th className="py-3 pr-4 text-right font-semibold">
+                  Ingredients
+                </th>
+                <th className="py-3 pr-3 text-right font-semibold">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {recipes.map((recipe) => (
                 <tr
-                  className="border-b border-gray-100 text-gray-900"
+                  className="border-b border-stone-100 text-sm text-stone-900 last:border-b-0"
                   key={recipe.id}
                 >
-                  <td className="py-3 pr-4 font-medium">
+                  <td className="max-w-xs py-4 pr-4 pl-3 align-top">
                     <Link
-                      className="font-bold text-gray-900 no-underline"
+                      className="font-bold text-stone-950 no-underline hover:text-emerald-800"
                       to={`/recipes/${recipe.id}`}
                     >
                       {recipe.title}
                     </Link>
+                    {recipe.description ? (
+                      <p className="m-0 mt-1 line-clamp-2 text-stone-600">
+                        {recipe.description}
+                      </p>
+                    ) : null}
                   </td>
-                  <td className="py-3 pr-4">
+                  <td className="py-4 pr-4 text-right align-top font-medium whitespace-nowrap">
                     {recipe.calories_per_serving} kcal
                   </td>
-                  <td className="py-3 pr-4">{recipe.total_calories} kcal</td>
-                  <td className="py-3 pr-4">{recipe.base_servings}</td>
-                  <td className="py-3 pr-4">{recipe.ingredient_count}</td>
-                  <td className="py-3">
-                    <div className="flex gap-4">
+                  <td className="py-4 pr-4 text-right align-top whitespace-nowrap">
+                    {recipe.total_calories} kcal
+                  </td>
+                  <td className="py-4 pr-4 text-right align-top">
+                    {recipe.base_servings}
+                  </td>
+                  <td className="py-4 pr-4 text-right align-top">
+                    {recipe.ingredient_count}
+                  </td>
+                  <td className="py-4 pr-3 align-top">
+                    <div className="flex justify-end gap-4">
                       <Link
-                        className="font-bold text-gray-900 no-underline"
+                        className="font-bold text-stone-900 no-underline hover:text-emerald-800"
                         to={`/recipes/${recipe.id}/edit`}
                       >
                         Edit
                       </Link>
                       <button
-                        className="cursor-pointer border-0 bg-transparent p-0 font-bold text-red-600 disabled:cursor-not-allowed disabled:text-red-300"
+                        className="cursor-pointer border-0 bg-transparent p-0 font-bold text-rose-700 disabled:cursor-not-allowed disabled:text-rose-300"
                         type="button"
                         disabled={
                           deleteRecipeMutation.isPending &&
