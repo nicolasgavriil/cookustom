@@ -75,6 +75,52 @@ async def create_recipe(
     return recipe
 
 
+@router.post(
+    "/{recipe_id}/variants",
+    response_model=RecipeResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_recipe_variant(
+    recipe_id: int,
+    recipe_create: RecipeCreateRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Recipe:
+    source_recipe = await db.scalar(
+        select(Recipe).where(
+            Recipe.id == recipe_id,
+            Recipe.user_id == current_user.id,
+        )
+    )
+    if source_recipe is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recipe not found",
+        )
+
+    ingredients_by_id = await get_user_ingredients_by_id(
+        db,
+        current_user,
+        recipe_create.ingredients,
+    )
+    recipe = Recipe(
+        user_id=current_user.id,
+        parent_recipe_id=get_variant_parent_recipe_id(source_recipe),
+        title=recipe_create.title,
+        description=recipe_create.description,
+        base_servings=recipe_create.base_servings,
+        instructions=recipe_create.instructions,
+        recipe_ingredients=build_recipe_ingredients(
+            recipe_create.ingredients,
+            ingredients_by_id,
+        ),
+    )
+    db.add(recipe)
+    await db.commit()
+
+    return recipe
+
+
 @router.get("/{recipe_id}", response_model=RecipeResponse)
 async def get_recipe(
     recipe_id: int,
@@ -241,3 +287,7 @@ def build_recipe_ingredients(
         )
         for ingredient_input in ingredient_inputs
     ]
+
+
+def get_variant_parent_recipe_id(source_recipe: Recipe) -> int:
+    return source_recipe.parent_recipe_id or source_recipe.id
