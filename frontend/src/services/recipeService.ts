@@ -29,6 +29,17 @@ export async function createRecipe(
   })
 }
 
+export async function createRecipeVariant(
+  sourceRecipeId: number,
+  request: RecipeCreateRequest,
+): Promise<Recipe> {
+  return fetchApiJson<Recipe>(`/recipes/${sourceRecipeId}/variants`, {
+    method: 'POST',
+    headers: getJsonAuthHeaders(),
+    body: JSON.stringify(request),
+  })
+}
+
 export async function updateRecipe(
   recipeId: number,
   request: RecipeUpdateRequest,

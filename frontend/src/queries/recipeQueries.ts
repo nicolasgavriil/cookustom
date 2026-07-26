@@ -42,6 +42,23 @@ export const useCreateRecipeMutation = () => {
   })
 }
 
+export const useCreateRecipeVariantMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      sourceRecipeId,
+      request,
+    }: {
+      sourceRecipeId: number
+      request: RecipeCreateRequest
+    }) => recipeService.createRecipeVariant(sourceRecipeId, request),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: recipesQueryKey })
+    },
+  })
+}
+
 export const useUpdateRecipeMutation = () => {
   const queryClient = useQueryClient()
 
