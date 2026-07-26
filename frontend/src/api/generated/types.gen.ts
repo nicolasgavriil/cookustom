@@ -243,6 +243,10 @@ export type RecipeSummaryResponse = {
      */
     ingredient_count: number;
     /**
+     * Parent Recipe Id
+     */
+    parent_recipe_id: number | null;
+    /**
      * Title
      */
     title: string;
@@ -673,3 +677,33 @@ export type UpdateRecipeRecipesRecipeIdPutResponses = {
 };
 
 export type UpdateRecipeRecipesRecipeIdPutResponse = UpdateRecipeRecipesRecipeIdPutResponses[keyof UpdateRecipeRecipesRecipeIdPutResponses];
+
+export type CreateRecipeVariantRecipesRecipeIdVariantsPostData = {
+    body: RecipeCreateRequest;
+    path: {
+        /**
+         * Recipe Id
+         */
+        recipe_id: number;
+    };
+    query?: never;
+    url: '/recipes/{recipe_id}/variants';
+};
+
+export type CreateRecipeVariantRecipesRecipeIdVariantsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateRecipeVariantRecipesRecipeIdVariantsPostError = CreateRecipeVariantRecipesRecipeIdVariantsPostErrors[keyof CreateRecipeVariantRecipesRecipeIdVariantsPostErrors];
+
+export type CreateRecipeVariantRecipesRecipeIdVariantsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: RecipeResponse;
+};
+
+export type CreateRecipeVariantRecipesRecipeIdVariantsPostResponse = CreateRecipeVariantRecipesRecipeIdVariantsPostResponses[keyof CreateRecipeVariantRecipesRecipeIdVariantsPostResponses];
