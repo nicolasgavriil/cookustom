@@ -5,6 +5,7 @@ type PageHeaderProps = {
   description?: string
   eyebrow: string
   icon?: ReactNode
+  meta?: ReactNode
   title: string
 }
 
@@ -13,6 +14,7 @@ export const PageHeader = ({
   description,
   eyebrow,
   icon,
+  meta,
   title,
 }: PageHeaderProps) => {
   return (
@@ -30,6 +32,7 @@ export const PageHeader = ({
           <h1 className="m-0 text-3xl leading-tight font-bold text-stone-950 sm:text-4xl">
             {title}
           </h1>
+          {meta ? <div className="mt-3 flex flex-wrap gap-2">{meta}</div> : null}
           {description ? (
             <p className="m-0 mt-3 max-w-3xl text-base leading-7 text-stone-600">
               {description}

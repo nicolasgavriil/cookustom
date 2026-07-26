@@ -11,6 +11,7 @@ import {
 import { useNavigate, useParams } from 'react-router'
 
 import type { Recipe } from '../api/types'
+import { RecipeVariantBadge } from '../components/RecipeVariantBadge'
 import { Button, ButtonLink } from '../components/ui/Button'
 import { PageHeader } from '../components/ui/PageHeader'
 import { StatusMessage } from '../components/ui/StatusMessage'
@@ -149,6 +150,7 @@ const RecipeContent = ({
           title={recipe.title}
           description={recipe.description ?? undefined}
           icon={<BookOpen className="size-6" aria-hidden="true" />}
+          meta={<RecipeVariantBadge parentRecipeId={recipe.parent_recipe_id} />}
           actions={
             <>
               <ButtonLink
