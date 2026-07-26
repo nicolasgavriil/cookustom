@@ -9,6 +9,7 @@ import { IngredientsPage } from './pages/IngredientsPage'
 import { LoginPage } from './pages/LoginPage'
 import { NewIngredientPage } from './pages/NewIngredientPage'
 import { NewRecipePage } from './pages/NewRecipePage'
+import { NewRecipeVariantPage } from './pages/NewRecipeVariantPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { RecipeDetailPage } from './pages/RecipeDetailPage'
@@ -63,10 +64,10 @@ const App = () => {
             }
           />
           <Route
-            path="/recipes/:recipeId"
+            path="/recipes/:recipeId/variants/new"
             element={
               <RequireAuth>
-                <RecipeDetailPage />
+                <NewRecipeVariantPage />
               </RequireAuth>
             }
           />
@@ -75,6 +76,14 @@ const App = () => {
             element={
               <RequireAuth>
                 <EditRecipePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/recipes/:recipeId"
+            element={
+              <RequireAuth>
+                <RecipeDetailPage />
               </RequireAuth>
             }
           />
