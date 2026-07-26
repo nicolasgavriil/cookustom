@@ -78,6 +78,7 @@ class RecipeSummaryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    parent_recipe_id: int | None
     title: str
     description: str | None
     base_servings: int
@@ -92,7 +93,6 @@ class RecipeSummaryResponse(BaseModel):
 
 
 class RecipeResponse(RecipeSummaryResponse):
-    parent_recipe_id: int | None
     instructions: str
     ingredients: list[RecipeIngredientResponse] = Field(
         validation_alias="recipe_ingredients"

@@ -128,6 +128,7 @@ def test_list_recipes_returns_summary_with_calories(
     recipe = data[0]
     assert recipe == {
         "id": created_recipe["id"],
+        "parent_recipe_id": None,
         "title": "Rice bowl",
         "description": None,
         "base_servings": 2,
@@ -136,6 +137,41 @@ def test_list_recipes_returns_summary_with_calories(
         "total_calories": 270,
         "calories_per_serving": 135,
     }
+
+
+def test_list_recipes_includes_variant_parent_recipe_id(
+    client: TestClient,
+) -> None:
+    register_user(client)
+    token = login_user(client)
+    rice = create_ingredient(client, token, name="Rice")
+    original_recipe = create_recipe(client, token, "Rice bowl", rice["id"])
+
+    variant_response = client.post(
+        f"/recipes/{original_recipe['id']}/variants",
+        headers=auth_headers(token),
+        json={
+            "title": "Rice bowl variant",
+            "description": "Variant meal",
+            "base_servings": 2,
+            "instructions": "Cook and serve.",
+            "ingredients": [
+                {
+                    "ingredient_id": rice["id"],
+                    "quantity": "150",
+                }
+            ],
+        },
+    )
+    assert variant_response.status_code == 201
+    variant = variant_response.json()
+
+    response = client.get("/recipes", headers=auth_headers(token))
+
+    assert response.status_code == 200
+    recipes_by_id = {recipe["id"]: recipe for recipe in response.json()}
+    assert recipes_by_id[original_recipe["id"]]["parent_recipe_id"] is None
+    assert recipes_by_id[variant["id"]]["parent_recipe_id"] == original_recipe["id"]
 
 
 def test_list_recipes_returns_newest_recipe_first(client: TestClient) -> None:
