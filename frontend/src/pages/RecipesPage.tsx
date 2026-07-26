@@ -5,6 +5,7 @@ import {
   useDeleteRecipeMutation,
   useRecipesQuery,
 } from '../queries/recipeQueries'
+import { RecipeVariantBadge } from '../components/RecipeVariantBadge'
 import { ButtonLink } from '../components/ui/Button'
 import { EmptyState } from '../components/ui/EmptyState'
 import { PageHeader } from '../components/ui/PageHeader'
@@ -118,12 +119,17 @@ export const RecipesPage = () => {
                   key={recipe.id}
                 >
                   <td className="max-w-xs py-4 pr-4 pl-3 align-top">
-                    <Link
-                      className="font-bold text-stone-950 no-underline hover:text-emerald-800"
-                      to={`/recipes/${recipe.id}`}
-                    >
-                      {recipe.title}
-                    </Link>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Link
+                        className="font-bold text-stone-950 no-underline hover:text-emerald-800"
+                        to={`/recipes/${recipe.id}`}
+                      >
+                        {recipe.title}
+                      </Link>
+                      <RecipeVariantBadge
+                        parentRecipeId={recipe.parent_recipe_id}
+                      />
+                    </div>
                     {recipe.description ? (
                       <p className="m-0 mt-1 line-clamp-2 text-stone-600">
                         {recipe.description}
