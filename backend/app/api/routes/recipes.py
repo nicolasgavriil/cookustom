@@ -207,6 +207,20 @@ async def delete_recipe(
             detail="Recipe not found",
         )
 
+    variant_id = await db.scalar(
+        select(Recipe.id)
+        .where(
+            Recipe.parent_recipe_id == recipe.id,
+            Recipe.user_id == current_user.id,
+        )
+        .limit(1)
+    )
+    if variant_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete recipe with variants",
+        )
+
     await db.delete(recipe)
     await db.commit()
 
