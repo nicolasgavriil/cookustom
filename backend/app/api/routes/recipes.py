@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -12,6 +13,7 @@ from app.models.recipe import Recipe, RecipeIngredient
 from app.models.user import User
 from app.schemas.recipe import (
     RecipeCreateRequest,
+    RecipeIngredientCreateRequest,
     RecipeResponse,
     RecipeSummaryResponse,
     RecipeUpdateRequest,
@@ -49,22 +51,11 @@ async def create_recipe(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> Recipe:
-    ingredient_input_ids = [
-        ingredient_input.ingredient_id for ingredient_input in recipe_create.ingredients
-    ]
-    ingredients = await db.scalars(
-        select(Ingredient).where(
-            Ingredient.user_id == current_user.id,
-            Ingredient.id.in_(ingredient_input_ids),
-        )
+    ingredients_by_id = await get_user_ingredients_by_id(
+        db,
+        current_user,
+        recipe_create.ingredients,
     )
-    ingredients_by_id = {ingredient.id: ingredient for ingredient in ingredients}
-
-    if len(ingredients_by_id) != len(ingredient_input_ids):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Ingredient not found",
-        )
 
     recipe = Recipe(
         user_id=current_user.id,
@@ -73,13 +64,10 @@ async def create_recipe(
         description=recipe_create.description,
         base_servings=recipe_create.base_servings,
         instructions=recipe_create.instructions,
-        recipe_ingredients=[
-            RecipeIngredient(
-                ingredient=ingredients_by_id[ingredient_input.ingredient_id],
-                quantity=ingredient_input.quantity,
-            )
-            for ingredient_input in recipe_create.ingredients
-        ],
+        recipe_ingredients=build_recipe_ingredients(
+            recipe_create.ingredients,
+            ingredients_by_id,
+        ),
     )
     db.add(recipe)
     await db.commit()
@@ -139,22 +127,11 @@ async def update_recipe(
             detail="Recipe not found",
         )
 
-    ingredient_input_ids = [
-        ingredient_input.ingredient_id for ingredient_input in recipe_update.ingredients
-    ]
-    ingredients = await db.scalars(
-        select(Ingredient).where(
-            Ingredient.user_id == current_user.id,
-            Ingredient.id.in_(ingredient_input_ids),
-        )
+    ingredients_by_id = await get_user_ingredients_by_id(
+        db,
+        current_user,
+        recipe_update.ingredients,
     )
-    ingredients_by_id = {ingredient.id: ingredient for ingredient in ingredients}
-
-    if len(ingredients_by_id) != len(ingredient_input_ids):
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Ingredient not found",
-        )
 
     recipe.title = recipe_update.title
     recipe.description = recipe_update.description
@@ -226,3 +203,41 @@ def sync_recipe_ingredients(
     recipe.recipe_ingredients.sort(
         key=lambda recipe_ingredient: recipe_ingredient.ingredient_id
     )
+
+
+async def get_user_ingredients_by_id(
+    db: AsyncSession,
+    current_user: User,
+    ingredient_inputs: Sequence[RecipeIngredientCreateRequest],
+) -> dict[int, Ingredient]:
+    ingredient_input_ids = [
+        ingredient_input.ingredient_id for ingredient_input in ingredient_inputs
+    ]
+    ingredients = await db.scalars(
+        select(Ingredient).where(
+            Ingredient.user_id == current_user.id,
+            Ingredient.id.in_(ingredient_input_ids),
+        )
+    )
+    ingredients_by_id = {ingredient.id: ingredient for ingredient in ingredients}
+
+    if len(ingredients_by_id) != len(ingredient_input_ids):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ingredient not found",
+        )
+
+    return ingredients_by_id
+
+
+def build_recipe_ingredients(
+    ingredient_inputs: Sequence[RecipeIngredientCreateRequest],
+    ingredients_by_id: dict[int, Ingredient],
+) -> list[RecipeIngredient]:
+    return [
+        RecipeIngredient(
+            ingredient=ingredients_by_id[ingredient_input.ingredient_id],
+            quantity=ingredient_input.quantity,
+        )
+        for ingredient_input in ingredient_inputs
+    ]
