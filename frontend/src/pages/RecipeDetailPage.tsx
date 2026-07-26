@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import {
   ArrowLeft,
+  ArrowUpRight,
   BookOpen,
   CopyPlus,
   Minus,
@@ -8,7 +9,7 @@ import {
   Plus,
   Trash2,
 } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 
 import type { Recipe } from '../api/types'
 import { RecipeVariantBadge } from '../components/RecipeVariantBadge'
@@ -114,6 +115,7 @@ const RecipeContent = ({
   const baseTotalCalories = calculateBaseTotalCalories(recipe)
   const caloriesPerServing = baseTotalCalories / recipe.base_servings
   const scaledTotalCalories = baseTotalCalories * scaleFactor
+  const isVariant = recipe.parent_recipe_id != null
 
   const handleServingsChange = (value: string) => {
     if (/^\d*$/.test(value)) {
@@ -150,7 +152,20 @@ const RecipeContent = ({
           title={recipe.title}
           description={recipe.description ?? undefined}
           icon={<BookOpen className="size-6" aria-hidden="true" />}
-          meta={<RecipeVariantBadge parentRecipeId={recipe.parent_recipe_id} />}
+          meta={
+            isVariant ? (
+              <>
+                <RecipeVariantBadge parentRecipeId={recipe.parent_recipe_id} />
+                <Link
+                  className="inline-flex items-center gap-1 rounded-md border border-stone-200 bg-white px-2 py-1 text-xs font-bold text-stone-800 no-underline hover:border-emerald-700 hover:text-emerald-800"
+                  to={`/recipes/${recipe.parent_recipe_id}`}
+                >
+                  View original recipe
+                  <ArrowUpRight className="size-3" aria-hidden="true" />
+                </Link>
+              </>
+            ) : undefined
+          }
           actions={
             <>
               <ButtonLink
