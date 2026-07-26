@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { ArrowLeft, BookOpen, Minus, Pencil, Plus, Trash2 } from 'lucide-react'
+import {
+  ArrowLeft,
+  BookOpen,
+  CopyPlus,
+  Minus,
+  Pencil,
+  Plus,
+  Trash2,
+} from 'lucide-react'
 import { useNavigate, useParams } from 'react-router'
 
 import type { Recipe } from '../api/types'
@@ -149,6 +157,13 @@ const RecipeContent = ({
                 to={`/recipes/${recipe.id}/edit`}
               >
                 Edit
+              </ButtonLink>
+              <ButtonLink
+                icon={<CopyPlus className="size-4" aria-hidden="true" />}
+                variant="secondary"
+                to={`/recipes/${recipe.id}/variants/new`}
+              >
+                Create variant
               </ButtonLink>
               <Button
                 icon={<Trash2 className="size-4" aria-hidden="true" />}
