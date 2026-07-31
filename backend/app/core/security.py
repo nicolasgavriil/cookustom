@@ -7,6 +7,7 @@ from pwdlib import PasswordHash
 from app.core.config import settings
 
 password_hasher = PasswordHash.recommended()
+JWT_ALGORITHM = "HS256"
 
 
 def hash_password(password: str) -> str:
@@ -24,8 +25,8 @@ def create_access_token(subject: str) -> str:
     payload = {"sub": subject, "exp": expires_at}
     return jwt.encode(
         payload,
-        settings.jwt_secret_key,
-        algorithm=settings.jwt_algorithm,
+        settings.jwt_secret_key.get_secret_value(),
+        algorithm=JWT_ALGORITHM,
     )
 
 
@@ -33,8 +34,9 @@ def decode_access_token(token: str) -> str:
     try:
         payload = jwt.decode(
             token,
-            settings.jwt_secret_key,
-            algorithms=[settings.jwt_algorithm],
+            settings.jwt_secret_key.get_secret_value(),
+            algorithms=[JWT_ALGORITHM],
+            options={"require": ["sub", "exp"]},
         )
     except InvalidTokenError as error:
         raise ValueError("Invalid access token") from error
