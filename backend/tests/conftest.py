@@ -1,18 +1,39 @@
 import asyncio
+import os
 from collections.abc import AsyncGenerator, Generator
 
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
-from app.core.config import settings
-from app.db.database import get_db
-from app.main import app
-from app.models.ingredient import Ingredient
-from app.models.recipe import Recipe
-from app.models.user import User
+from tests.database_settings import DatabaseTestSettings
+
+
+def load_test_database_url() -> str:
+    try:
+        # BaseSettings loads required fields from environment sources at runtime.
+        settings = DatabaseTestSettings()  # pyright: ignore[reportCallIssue]
+        return settings.test_database_url
+    except ValidationError as error:
+        raise RuntimeError(
+            "TEST_DATABASE_URL must identify a database whose name ends with '_test'"
+        ) from error
+
+
+test_database_url = load_test_database_url()
+os.environ["DATABASE_URL"] = test_database_url
+os.environ["ENVIRONMENT"] = "test"
+os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-with-at-least-32-characters"
+
+# Test environment must be configured before importing application modules.
+from app.db.database import get_db  # noqa: E402
+from app.main import app  # noqa: E402
+from app.models.ingredient import Ingredient  # noqa: E402
+from app.models.recipe import Recipe  # noqa: E402
+from app.models.user import User  # noqa: E402
 
 TEST_EMAILS = {
     "another.user@example.com",
@@ -23,7 +44,8 @@ TEST_EMAILS = {
     "unknown@example.com",
 }
 
-test_engine = create_async_engine(settings.database_url, poolclass=NullPool)
+
+test_engine = create_async_engine(test_database_url, poolclass=NullPool)
 TestAsyncSessionLocal = async_sessionmaker(
     test_engine,
     class_=AsyncSession,
