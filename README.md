@@ -1,16 +1,32 @@
 # Recipe App
 
-A full-stack personal recipe and nutrition manager built with FastAPI, PostgreSQL, React, and TypeScript.
+A full-stack recipe and nutrition manager for building a personal ingredient
+library, creating recipes, scaling servings, and saving recipe variants.
 
-## Planned Features
+The application is built as a monorepo with a FastAPI backend, PostgreSQL
+database, and React frontend.
 
-- User registration and protected user data
-- Personal ingredient library with manually entered calorie values
+## Features
+
+- User registration, login, and protected personal data
+- Ingredient library with user-defined units and calories per unit
 - Recipe creation, editing, listing, detail views, and deletion
 - Recipe ingredients linked to the user's ingredient library
-- Serving-based recipe scaling
-- Total and per-serving calorie calculations
-- Recipe variants that preserve the original recipe
+- Serving-based ingredient and calorie scaling
+- Total and per-serving calorie summaries
+- Recipe variants that preserve a connection to the original recipe
+- Forms, routing, server-state caching, and generated API types
+
+## Technical Overview
+
+- The backend exposes a REST API with async FastAPI route handlers.
+- SQLAlchemy models represent users, ingredients, recipes, recipe ingredients,
+  and recipe variants.
+- Alembic migrations manage database schema changes.
+- Pydantic schemas define request and response shapes and generate frontend
+  TypeScript types from the OpenAPI schema.
+- The frontend uses React Router for pages, TanStack Query for server state,
+  and React Hook Form for forms.
 
 ## Tech Stack
 
@@ -38,35 +54,23 @@ A full-stack personal recipe and nutrition manager built with FastAPI, PostgreSQ
 - Tailwind CSS
 - pnpm
 
-## Development Status
+## Local Development
 
-This project is in early development. The initial focus is building the backend foundation with a small, tested FastAPI application before adding the database schema, authentication, recipe management, and frontend.
+### Prerequisites
 
-## Backend Development
+- Docker and Docker Compose
+- uv
+- pnpm
 
-From the `backend/` directory:
-
-```bash
-uv run uvicorn app.main:app --reload
-```
-
-Run backend tests and lint checks:
+Enable package manager shims if `pnpm` is not already available:
 
 ```bash
-uv run pytest
-uv run ruff check .
-uv run ruff format --check .
+corepack enable
 ```
 
-Run Alembic commands from the `backend/` directory:
+### Database
 
-```bash
-uv run alembic -c alembic.ini current
-```
-
-## Local Database
-
-Copy the example environment file if you want to override the default local database values:
+Copy the root Docker environment example:
 
 ```bash
 cp .env.example .env
@@ -78,49 +82,91 @@ Start PostgreSQL from the repository root:
 docker compose up -d postgres
 ```
 
-The backend reads its own environment from `backend/.env`. Copy the example file before running database-backed features:
-
-```bash
-cp backend/.env.example backend/.env
-```
-
-If your machine already has PostgreSQL running on port `5432`, use another host port for this project's Docker database. For example:
+If your machine already has PostgreSQL running on port `5432`, use another host
+port for this project's Docker database:
 
 ```env
 POSTGRES_PORT=5433
 ```
 
-Then update `backend/.env` to use the same host port:
+Then use the same host port in `backend/.env` for both database URLs.
 
-```env
-DATABASE_URL=postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5433/recipe_app
-```
+### Backend Environment
 
-## Frontend Development
-
-Enable package manager shims if `pnpm` is not already available:
+Copy the backend environment example:
 
 ```bash
-corepack enable
+cp backend/.env.example backend/.env
 ```
 
-From the `frontend/` directory:
+Generate a local JWT signing secret and replace the placeholder
+`JWT_SECRET_KEY` in `backend/.env`:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(32))"
+```
+
+The placeholder value is intentionally rejected so the application cannot start
+with a public signing key.
+
+Create the isolated test database the first time you initialize the local
+PostgreSQL volume:
+
+```bash
+docker compose exec postgres sh -c 'createdb --username "$POSTGRES_USER" --owner "$POSTGRES_USER" --maintenance-db "$POSTGRES_DB" recipe_app_test'
+```
+
+Apply migrations to the development database:
+
+```bash
+cd backend
+uv run alembic -c alembic.ini upgrade head
+```
+
+Apply the same migrations to the test database:
+
+```bash
+DATABASE_URL=postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test uv run alembic -c alembic.ini upgrade head
+```
+
+If you changed `POSTGRES_PORT`, update the port in `backend/.env` and in the
+test database migration command.
+
+### Frontend Environment
+
+Copy the frontend environment example:
+
+```bash
+cp frontend/.env.example frontend/.env
+```
+
+For local development, the example points to the local backend:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+## Running The App
+
+Start the backend from `backend/`:
+
+```bash
+uv run uvicorn app.main:app --reload
+```
+
+Start the frontend from `frontend/`:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Run frontend checks:
-
-```bash
-pnpm lint
-pnpm build
-```
+## API Types
 
 Generate frontend API types from the FastAPI OpenAPI schema:
 
 ```bash
+cd frontend
 pnpm generate:api-types
 ```
 
