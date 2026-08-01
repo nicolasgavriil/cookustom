@@ -29,6 +29,7 @@ os.environ["ENVIRONMENT"] = "test"
 os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-with-at-least-32-characters"
 
 # Test environment must be configured before importing application modules.
+from app.core.config import build_sqlalchemy_database_url  # noqa: E402
 from app.db.database import get_db  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models.ingredient import Ingredient  # noqa: E402
@@ -45,7 +46,10 @@ TEST_EMAILS = {
 }
 
 
-test_engine = create_async_engine(test_database_url, poolclass=NullPool)
+test_engine = create_async_engine(
+    build_sqlalchemy_database_url(test_database_url),
+    poolclass=NullPool,
+)
 TestAsyncSessionLocal = async_sessionmaker(
     test_engine,
     class_=AsyncSession,

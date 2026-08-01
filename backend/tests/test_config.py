@@ -8,6 +8,7 @@ from app.core.config import (
     EXAMPLE_JWT_SECRET_KEY,
     MAX_ACCESS_TOKEN_EXPIRE_MINUTES,
     Settings,
+    build_sqlalchemy_database_url,
 )
 
 DATABASE_URL = "postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/app"
@@ -34,6 +35,36 @@ def test_settings_allow_local_config() -> None:
 
     assert settings.environment == "development"
     assert settings.jwt_secret_key.get_secret_value() == JWT_SECRET_KEY
+    assert settings.sqlalchemy_database_url == DATABASE_URL
+
+
+@pytest.mark.parametrize(
+    ("database_url", "expected_database_url"),
+    [
+        (
+            "postgresql://recipe_app:secret@localhost:5432/recipe_app",
+            "postgresql+asyncpg://recipe_app:secret@localhost:5432/recipe_app",
+        ),
+        (
+            "postgres://recipe_app:secret@localhost:5432/recipe_app",
+            "postgresql+asyncpg://recipe_app:secret@localhost:5432/recipe_app",
+        ),
+        (
+            "postgresql+asyncpg://recipe_app:secret@localhost:5432/recipe_app",
+            "postgresql+asyncpg://recipe_app:secret@localhost:5432/recipe_app",
+        ),
+    ],
+)
+def test_build_sqlalchemy_database_url_uses_async_postgres_driver(
+    database_url: str,
+    expected_database_url: str,
+) -> None:
+    assert build_sqlalchemy_database_url(database_url) == expected_database_url
+
+
+def test_settings_reject_unsupported_database_url_scheme() -> None:
+    with pytest.raises(ValidationError):
+        build_settings(database_url="sqlite:///recipe_app.db")
 
 
 @pytest.mark.parametrize(

@@ -10,7 +10,7 @@ class Base(DeclarativeBase):
     pass
 
 
-engine = create_async_engine(settings.database_url)
+engine = create_async_engine(settings.sqlalchemy_database_url)
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
