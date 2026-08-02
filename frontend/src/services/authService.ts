@@ -1,4 +1,4 @@
-import { fetchApiJson } from '../api/fetchApi'
+import { ApiError, fetchApiJson } from '../api/fetchApi'
 import type {
   LoginRequest,
   TokenResponse,
@@ -34,11 +34,20 @@ export async function getCurrentUser(): Promise<User | null> {
     return null
   }
 
-  return fetchApiJson<User>('/auth/me', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
+  try {
+    return await fetchApiJson<User>('/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      tokenStorage.clearAccessToken()
+      return null
+    }
+
+    throw error
+  }
 }
 
 export function logout(): void {

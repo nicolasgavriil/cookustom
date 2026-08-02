@@ -1,6 +1,16 @@
 import { API_BASE_URL } from './config'
 import { getApiErrorMessage, getNetworkErrorMessage } from './errors'
 
+export class ApiError extends Error {
+  readonly status: number
+
+  constructor(message: string, status: number) {
+    super(message)
+    this.name = 'ApiError'
+    this.status = status
+  }
+}
+
 export const fetchApi = async (
   path: string,
   init?: RequestInit,
@@ -14,7 +24,7 @@ export const fetchApi = async (
   }
 
   if (!response.ok) {
-    throw new Error(await getApiErrorMessage(response))
+    throw new ApiError(await getApiErrorMessage(response), response.status)
   }
 
   return response

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { Navigate } from 'react-router'
 
 import { useCurrentUserQuery } from '../queries/authQueries'
+import { tokenStorage } from '../utils/tokenStorage'
 import { StatusMessage } from './ui/StatusMessage'
 
 type RequireAuthProps = {
@@ -10,8 +11,9 @@ type RequireAuthProps = {
 
 export const RequireAuth = ({ children }: RequireAuthProps) => {
   const currentUserQuery = useCurrentUserQuery()
+  const hasToken = tokenStorage.hasAccessToken()
 
-  if (currentUserQuery.isPending) {
+  if (hasToken && currentUserQuery.isPending) {
     return <StatusMessage loading>Loading...</StatusMessage>
   }
 
