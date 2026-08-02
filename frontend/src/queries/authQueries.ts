@@ -7,13 +7,12 @@ import { tokenStorage } from '../utils/tokenStorage'
 export const currentUserQueryKey = ['currentUser'] as const
 
 export const useCurrentUserQuery = () => {
-  const hasToken = tokenStorage.getAccessToken() !== null
+  const hasToken = tokenStorage.hasAccessToken()
 
   return useQuery({
     queryKey: currentUserQueryKey,
     queryFn: authService.getCurrentUser,
     enabled: hasToken,
-    initialData: null,
     retry: false,
   })
 }
