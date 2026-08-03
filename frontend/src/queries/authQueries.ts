@@ -1,10 +1,22 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  type QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 
 import type { LoginRequest, UserCreateRequest } from '../api/types'
 import * as authService from '../services/authService'
 import { tokenStorage } from '../utils/tokenStorage'
+import { ingredientsQueryKey } from './ingredientQueries'
+import { recipesQueryKey } from './recipeQueries'
 
 export const currentUserQueryKey = ['currentUser'] as const
+
+const clearUserScopedQueryData = (queryClient: QueryClient) => {
+  queryClient.removeQueries({ queryKey: ingredientsQueryKey })
+  queryClient.removeQueries({ queryKey: recipesQueryKey })
+}
 
 export const useCurrentUserQuery = () => {
   const hasToken = tokenStorage.hasAccessToken()
@@ -13,7 +25,6 @@ export const useCurrentUserQuery = () => {
     queryKey: currentUserQueryKey,
     queryFn: authService.getCurrentUser,
     enabled: hasToken,
-    retry: false,
   })
 }
 
@@ -28,6 +39,7 @@ export const useLoginMutation = () => {
       return authService.getCurrentUser()
     },
     onSuccess: (user) => {
+      clearUserScopedQueryData(queryClient)
       queryClient.setQueryData(currentUserQueryKey, user)
     },
   })
@@ -46,6 +58,7 @@ export const useRegisterMutation = () => {
       return authService.getCurrentUser()
     },
     onSuccess: (user) => {
+      clearUserScopedQueryData(queryClient)
       queryClient.setQueryData(currentUserQueryKey, user)
     },
   })
@@ -56,6 +69,7 @@ export const useLogout = () => {
 
   return () => {
     authService.logout()
+    clearUserScopedQueryData(queryClient)
     queryClient.setQueryData(currentUserQueryKey, null)
   }
 }

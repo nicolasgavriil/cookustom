@@ -13,13 +13,25 @@ export const RequireAuth = ({ children }: RequireAuthProps) => {
   const currentUserQuery = useCurrentUserQuery()
   const hasToken = tokenStorage.hasAccessToken()
 
-  if (hasToken && currentUserQuery.isPending) {
-    return <StatusMessage loading>Loading...</StatusMessage>
+  if (currentUserQuery.data) {
+    return children
   }
 
-  if (!currentUserQuery.data) {
+  if (!hasToken) {
     return <Navigate to="/login" replace />
   }
 
-  return children
+  if (currentUserQuery.isPending) {
+    return <StatusMessage loading>Loading...</StatusMessage>
+  }
+
+  if (currentUserQuery.isError) {
+    return (
+      <StatusMessage tone="danger">
+        Unable to verify your session. Try again in a moment.
+      </StatusMessage>
+    )
+  }
+
+  return <Navigate to="/login" replace />
 }
