@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.dependencies import get_current_user
 from app.db.database import get_db
 from app.models.ingredient import Ingredient
+from app.models.recipe import RecipeIngredient
 from app.models.user import User
 from app.schemas.ingredient import (
     IngredientCreateRequest,
@@ -123,6 +124,17 @@ async def delete_ingredient(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Ingredient not found",
+        )
+
+    used_ingredient_id = await db.scalar(
+        select(RecipeIngredient.ingredient_id)
+        .where(RecipeIngredient.ingredient_id == ingredient.id)
+        .limit(1)
+    )
+    if used_ingredient_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Ingredient is used by a recipe",
         )
 
     await db.delete(ingredient)

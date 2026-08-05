@@ -27,6 +27,22 @@ def create_ingredient(
     return response.json()
 
 
+def create_recipe(client: TestClient, token: str, ingredient_id: int) -> dict:
+    response = client.post(
+        "/recipes",
+        headers=auth_headers(token),
+        json={
+            "title": "Rice bowl",
+            "description": "Simple lunch",
+            "base_servings": 2,
+            "instructions": "Cook rice.",
+            "ingredients": [{"ingredient_id": ingredient_id, "quantity": "100"}],
+        },
+    )
+    assert response.status_code == 201
+    return response.json()
+
+
 def test_delete_ingredient_deletes_owned_ingredient(client: TestClient) -> None:
     register_user(client)
     token = login_user(client)
@@ -42,6 +58,26 @@ def test_delete_ingredient_deletes_owned_ingredient(client: TestClient) -> None:
     assert response.content == b""
     assert list_response.status_code == 200
     assert list_response.json() == []
+
+
+def test_delete_ingredient_returns_conflict_when_used_by_recipe(
+    client: TestClient,
+) -> None:
+    register_user(client)
+    token = login_user(client)
+    ingredient = create_ingredient(client, token, name="Rice")
+    create_recipe(client, token, ingredient_id=ingredient["id"])
+
+    response = client.delete(
+        f"/ingredients/{ingredient['id']}",
+        headers=auth_headers(token),
+    )
+    list_response = client.get("/ingredients", headers=auth_headers(token))
+
+    assert response.status_code == 409
+    assert response.json() == {"detail": "Ingredient is used by a recipe"}
+    assert list_response.status_code == 200
+    assert [ingredient["name"] for ingredient in list_response.json()] == ["Rice"]
 
 
 def test_delete_ingredient_rejects_missing_token(client: TestClient) -> None:
