@@ -1,0 +1,212 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: recipe_app_test
+          POSTGRES_USER: recipe_app
+          POSTGRES_PASSWORD: recipe_app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U recipe_app -d recipe_app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: backend
+
+    env:
+      APP_NAME: Recipe App API
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
+      TEST_DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
+      JWT_SECRET_KEY: test-jwt-secret-key-with-at-least-32-characters
+      FRONTEND_ORIGINS: http://localhost:5173
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install backend dependencies
+        run: uv sync --locked --dev
+
+      - name: Check backend formatting
+        run: uv run ruff format --check .
+
+      - name: Lint backend
+        run: uv run ruff check .
+
+      - name: Run database migrations
+        run: uv run alembic -c alembic.ini upgrade head
+
+      - name: Check migration autogeneration
+        run: uv run alembic -c alembic.ini check
+
+      - name: Run backend tests
+        run: uv run pytest
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    env:
+      VITE_API_BASE_URL: http://localhost:8000
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Audit production dependencies
+        run: pnpm audit --prod
+
+      - name: Lint frontend
+        run: pnpm lint
+
+      - name: Build frontend
+        run: pnpm build
+
+  e2e:
+    name: E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs:
+      - backend
+      - frontend
+
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: recipe_app_test
+          POSTGRES_USER: recipe_app
+          POSTGRES_PASSWORD: recipe_app_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U recipe_app -d recipe_app_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      APP_NAME: Recipe App API
+      ENVIRONMENT: test
+      DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
+      TEST_DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
+      E2E_DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
+      JWT_SECRET_KEY: test-jwt-secret-key-with-at-least-32-characters
+      FRONTEND_ORIGINS: http://127.0.0.1:5174
+      VITE_API_BASE_URL: http://127.0.0.1:8001
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v8
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          package_json_file: frontend/package.json
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: uv sync --locked --dev
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Check generated API types
+        working-directory: frontend
+        run: |
+          pnpm generate:api-types
+          git add --intent-to-add src/api/generated
+          git diff --exit-code -- src/api/generated
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run Playwright tests
+        working-directory: frontend
+        run: pnpm test:e2e
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-artifacts
+          path: |
+            frontend/playwright-report/
+            frontend/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
