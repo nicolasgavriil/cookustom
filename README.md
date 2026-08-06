@@ -7,6 +7,16 @@ variants.
 The app is built as a monorepo with a FastAPI backend, PostgreSQL database, and
 React frontend.
 
+## Motivation
+
+This project started from a request by a family member who found that the recipe
+applications they had tried did not fit how they want to manage their own
+recipes and ingredient data.
+
+The application focuses on their core workflow: maintaining a reusable ingredient
+library, calculating calorie data, scaling quantities for different serving
+counts, and creating recipe variants without overwriting the original.
+
 ## What It Does
 
 - Register and log in with JWT-based authentication
