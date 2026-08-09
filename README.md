@@ -1,8 +1,10 @@
-# Recipe App
+# Cookustom
 
-A full-stack recipe manager for maintaining a personal ingredient library,
-building recipes from those ingredients, scaling servings, and saving recipe
-variants.
+Customize every recipe to your taste.
+
+Cookustom is a full-stack recipe manager for maintaining a personal ingredient
+library, building recipes from those ingredients, scaling servings, and saving
+recipe variants.
 
 The app is built as a monorepo with a FastAPI backend, PostgreSQL database, and
 React frontend.

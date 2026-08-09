@@ -42,7 +42,7 @@ export const NavBar = () => {
             <span className="flex size-9 items-center justify-center rounded-lg bg-emerald-800 text-white">
               <ChefHat className="size-5" aria-hidden="true" />
             </span>
-            Recipe App
+            Cookustom
           </Link>
 
           {currentUserQuery.data ? (

@@ -38,7 +38,7 @@ def build_sqlalchemy_database_url(database_url: str) -> str:
 
 
 class Settings(BaseSettings):
-    app_name: str = "Recipe App API"
+    app_name: str = "Cookustom API"
     environment: Environment
     database_url: str
     jwt_secret_key: SecretStr
