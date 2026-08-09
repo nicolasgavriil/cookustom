@@ -9,6 +9,9 @@ recipe variants.
 The app is built as a monorepo with a FastAPI backend, PostgreSQL database, and
 React frontend.
 
+- **Live app:** [cookustom.com](https://cookustom.com)
+- **API documentation:** [api.cookustom.com/docs](https://api.cookustom.com/docs)
+
 ## Motivation
 
 This project started from a request by a family member who found that the recipe
@@ -16,7 +19,7 @@ applications they had tried did not fit how they want to manage their own
 recipes and ingredient data.
 
 The application focuses on their core workflow: maintaining a reusable ingredient
-library, calculating calorie data, scaling quantities for different serving
+library, calculating calorie estimates, scaling quantities for different serving
 counts, and creating recipe variants without overwriting the original.
 
 ## What It Does
@@ -39,7 +42,7 @@ counts, and creating recipe variants without overwriting the original.
 - Alembic migrations for schema changes
 - Pydantic request and response schemas
 - JWT authentication and password hashing with Argon2
-- Pytest coverage
+- Pytest test suite
 
 ### Frontend
 
@@ -176,18 +179,4 @@ pnpm generate:api-types
 ```
 
 The generated files are used through a small frontend type facade in
-`frontend/src/api/types.ts`, while API requests remain explicit service
-functions.
-
-## Deployment Notes
-
-The current deployment shape is:
-
-- Vercel serves the frontend static build.
-- Render runs the FastAPI backend.
-- PostgreSQL is provided as a managed database.
-- Production configuration is supplied through platform environment variables,
-  not committed files.
-
-The backend validates required production settings at startup, including the
-database URL, JWT secret, environment name, and allowed frontend origins.
+`frontend/src/api/types.ts`.
