@@ -39,7 +39,7 @@ jobs:
         working-directory: backend
 
     env:
-      APP_NAME: Recipe App API
+      APP_NAME: Cookustom API
       ENVIRONMENT: test
       DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
       TEST_DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
@@ -142,7 +142,7 @@ jobs:
           --health-retries 5
 
     env:
-      APP_NAME: Recipe App API
+      APP_NAME: Cookustom API
       ENVIRONMENT: test
       DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test
       TEST_DATABASE_URL: postgresql+asyncpg://recipe_app:recipe_app_password@localhost:5432/recipe_app_test

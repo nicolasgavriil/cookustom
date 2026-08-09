@@ -14,10 +14,10 @@ export const DashboardPage = () => {
           <ChefHat className="size-6" aria-hidden="true" />
         </div>
         <p className="mt-8 mb-2 text-xs font-bold tracking-widest text-emerald-800 uppercase">
-          Recipe App
+          Cookustom
         </p>
         <h1 className="m-0 max-w-3xl text-4xl leading-tight font-bold text-stone-950 sm:text-5xl">
-          A cozy workspace for recipes, ingredients, and calories.
+          Customize every recipe to your taste.
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-7 text-stone-600">
           Keep your personal library organized around the meals you actually
