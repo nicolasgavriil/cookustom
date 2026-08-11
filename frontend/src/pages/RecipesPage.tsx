@@ -12,6 +12,7 @@ import { ButtonLink } from '../components/ui/Button'
 import { EmptyState } from '../components/ui/EmptyState'
 import { PageHeader } from '../components/ui/PageHeader'
 import { StatusMessage } from '../components/ui/StatusMessage'
+import { formatWholeCalories } from '../utils/numberFormatters'
 
 export const RecipesPage = () => {
   const [expandedRecipeIds, setExpandedRecipeIds] = useState<Set<number>>(
@@ -256,10 +257,10 @@ const RecipeTableRow = ({
         ) : null}
       </td>
       <td className="py-4 pr-4 text-right align-top font-medium whitespace-nowrap">
-        {recipe.calories_per_serving} kcal
+        {formatWholeCalories(recipe.calories_per_serving)} kcal
       </td>
       <td className="py-4 pr-4 text-right align-top whitespace-nowrap">
-        {recipe.total_calories} kcal
+        {formatWholeCalories(recipe.total_calories)} kcal
       </td>
       <td className="py-4 pr-4 text-right align-top">
         {recipe.base_servings}

@@ -103,8 +103,8 @@ def test_create_variant_creates_recipe_from_full_request(
     assert data["description"] == "Higher protein"
     assert data["base_servings"] == 4
     assert data["instructions"] == "Cook chicken."
-    assert data["total_calories"] == 500
-    assert data["calories_per_serving"] == 125
+    assert_decimal_equal(data["total_calories"], "500")
+    assert_decimal_equal(data["calories_per_serving"], "125")
     assert data["ingredients"][0]["ingredient_id"] == chicken["id"]
     assert_decimal_equal(data["ingredients"][0]["quantity"], "200")
 

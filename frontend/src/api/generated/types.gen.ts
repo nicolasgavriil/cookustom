@@ -141,7 +141,7 @@ export type RecipeIngredientResponse = {
     /**
      * Calories
      */
-    calories: number;
+    calories: string;
     /**
      * Calories Per Unit
      */
@@ -175,7 +175,7 @@ export type RecipeResponse = {
     /**
      * Calories Per Serving
      */
-    calories_per_serving: number;
+    calories_per_serving: string;
     /**
      * Created At
      */
@@ -211,7 +211,7 @@ export type RecipeResponse = {
     /**
      * Total Calories
      */
-    total_calories: number;
+    total_calories: string;
 };
 
 /**
@@ -225,7 +225,7 @@ export type RecipeSummaryResponse = {
     /**
      * Calories Per Serving
      */
-    calories_per_serving: number;
+    calories_per_serving: string;
     /**
      * Created At
      */
@@ -253,7 +253,7 @@ export type RecipeSummaryResponse = {
     /**
      * Total Calories
      */
-    total_calories: number;
+    total_calories: string;
 };
 
 /**
