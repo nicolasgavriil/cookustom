@@ -1,7 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.domain.ingredient import IngredientUnit
 
@@ -69,10 +69,6 @@ class RecipeIngredientResponse(BaseModel):
     calories_per_unit: Decimal
     calories: Decimal
 
-    @field_serializer("calories")
-    def serialize_calories(self, value: Decimal) -> int:
-        return round(value)
-
 
 class RecipeSummaryResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -86,10 +82,6 @@ class RecipeSummaryResponse(BaseModel):
     created_at: datetime
     total_calories: Decimal
     calories_per_serving: Decimal
-
-    @field_serializer("total_calories", "calories_per_serving")
-    def serialize_calories(self, value: Decimal) -> int:
-        return round(value)
 
 
 class RecipeResponse(RecipeSummaryResponse):

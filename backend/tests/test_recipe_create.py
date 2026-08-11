@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fastapi.testclient import TestClient
 
 from tests.conftest import login_user, register_user
@@ -35,6 +37,10 @@ def recipe_payload(ingredient_id: int) -> dict:
         "instructions": "Cook rice. Add egg.",
         "ingredients": [{"ingredient_id": ingredient_id, "quantity": "100"}],
     }
+
+
+def assert_decimal_equal(value: str, expected: str) -> None:
+    assert Decimal(value) == Decimal(expected)
 
 
 def test_create_recipe_creates_recipe_with_calorie_summary(
@@ -81,16 +87,19 @@ def test_create_recipe_creates_recipe_with_calorie_summary(
     assert data["base_servings"] == 2
     assert data["instructions"] == "Cook rice. Add egg."
     assert "created_at" in data
-    assert data["total_calories"] == 270
-    assert data["calories_per_serving"] == 135
-    assert data["ingredients"] == [
+    assert_decimal_equal(data["total_calories"], "270")
+    assert_decimal_equal(data["calories_per_serving"], "135")
+    ingredients_without_calories = [
+        {key: value for key, value in ingredient.items() if key != "calories"}
+        for ingredient in data["ingredients"]
+    ]
+    assert ingredients_without_calories == [
         {
             "ingredient_id": rice["id"],
             "ingredient_name": "Rice",
             "unit": "g",
             "quantity": "100",
             "calories_per_unit": "1.3000",
-            "calories": 130,
         },
         {
             "ingredient_id": egg["id"],
@@ -98,12 +107,13 @@ def test_create_recipe_creates_recipe_with_calorie_summary(
             "unit": "piece",
             "quantity": "2",
             "calories_per_unit": "70.0000",
-            "calories": 140,
         },
     ]
+    assert_decimal_equal(data["ingredients"][0]["calories"], "130")
+    assert_decimal_equal(data["ingredients"][1]["calories"], "140")
 
 
-def test_create_recipe_returns_calculated_calories_as_whole_numbers(
+def test_create_recipe_preserves_fractional_calories(
     client: TestClient,
 ) -> None:
     register_user(client)
@@ -113,7 +123,7 @@ def test_create_recipe_returns_calculated_calories_as_whole_numbers(
         token,
         name="Oil",
         unit="ml",
-        calories_per_unit="2.6",
+        calories_per_unit="2.5",
     )
 
     response = client.post(
@@ -132,9 +142,12 @@ def test_create_recipe_returns_calculated_calories_as_whole_numbers(
 
     assert response.status_code == 201
     data = response.json()
-    assert data["ingredients"][0]["calories"] == 3
-    assert data["total_calories"] == 3
-    assert data["calories_per_serving"] == 3
+    assert isinstance(data["ingredients"][0]["calories"], str)
+    assert isinstance(data["total_calories"], str)
+    assert isinstance(data["calories_per_serving"], str)
+    assert_decimal_equal(data["ingredients"][0]["calories"], "2.5")
+    assert_decimal_equal(data["total_calories"], "2.5")
+    assert_decimal_equal(data["calories_per_serving"], "2.5")
 
 
 def test_create_recipe_rejects_missing_token(client: TestClient) -> None:

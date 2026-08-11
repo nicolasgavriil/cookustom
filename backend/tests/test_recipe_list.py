@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from fastapi.testclient import TestClient
 
 from tests.conftest import login_user, register_user
@@ -52,6 +54,10 @@ def create_recipe(
     )
     assert response.status_code == 201
     return response.json()
+
+
+def assert_decimal_equal(value: str, expected: str) -> None:
+    assert Decimal(value) == Decimal(expected)
 
 
 def test_list_recipes_returns_empty_list_for_new_user(client: TestClient) -> None:
@@ -126,6 +132,10 @@ def test_list_recipes_returns_summary_with_calories(
     data = response.json()
     assert len(data) == 1
     recipe = data[0]
+    calories = {
+        "total_calories": recipe.pop("total_calories"),
+        "calories_per_serving": recipe.pop("calories_per_serving"),
+    }
     assert recipe == {
         "id": created_recipe["id"],
         "parent_recipe_id": None,
@@ -134,9 +144,9 @@ def test_list_recipes_returns_summary_with_calories(
         "base_servings": 2,
         "ingredient_count": 2,
         "created_at": created_recipe["created_at"],
-        "total_calories": 270,
-        "calories_per_serving": 135,
     }
+    assert_decimal_equal(calories["total_calories"], "270")
+    assert_decimal_equal(calories["calories_per_serving"], "135")
 
 
 def test_list_recipes_includes_variant_parent_recipe_id(

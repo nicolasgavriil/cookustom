@@ -9,6 +9,7 @@ import { ButtonLink } from '../components/ui/Button'
 import { EmptyState } from '../components/ui/EmptyState'
 import { PageHeader } from '../components/ui/PageHeader'
 import { StatusMessage } from '../components/ui/StatusMessage'
+import { formatDecimal } from '../utils/numberFormatters'
 
 export const IngredientsPage = () => {
   const ingredientsQuery = useIngredientsQuery()
@@ -114,7 +115,7 @@ export const IngredientsPage = () => {
                   </td>
                   <td className="py-4 pr-4 text-right">{ingredient.unit}</td>
                   <td className="py-4 pr-4 text-right">
-                    {ingredient.calories_per_unit}
+                    {formatDecimal(ingredient.calories_per_unit)}
                   </td>
                   <td className="py-4 pr-3">
                     <div className="flex justify-end gap-4">

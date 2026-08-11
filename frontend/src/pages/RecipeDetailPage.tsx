@@ -20,6 +20,7 @@ import {
   useDeleteRecipeMutation,
   useRecipeQuery,
 } from '../queries/recipeQueries'
+import { formatDecimal, formatWholeCalories } from '../utils/numberFormatters'
 
 export const RecipeDetailPage = () => {
   const navigate = useNavigate()
@@ -112,8 +113,8 @@ const RecipeContent = ({
   const [targetServings, setTargetServings] = useState(recipe.base_servings)
   const servingsError = getServingInputError(servingsInput)
   const scaleFactor = targetServings / recipe.base_servings
-  const baseTotalCalories = calculateBaseTotalCalories(recipe)
-  const caloriesPerServing = baseTotalCalories / recipe.base_servings
+  const baseTotalCalories = Number(recipe.total_calories)
+  const caloriesPerServing = Number(recipe.calories_per_serving)
   const scaledTotalCalories = baseTotalCalories * scaleFactor
   const isVariant = recipe.parent_recipe_id != null
 
@@ -262,7 +263,7 @@ const RecipeContent = ({
             Per serving
           </dt>
           <dd className="m-0 mt-2 text-2xl font-bold text-stone-950">
-            {formatCalories(caloriesPerServing)} kcal
+            {formatWholeCalories(caloriesPerServing)} kcal
           </dd>
         </div>
         <div className="border-b border-stone-200 p-5 sm:border-r sm:border-b-0">
@@ -270,7 +271,7 @@ const RecipeContent = ({
             Total for {targetServings}
           </dt>
           <dd className="m-0 mt-2 text-2xl font-bold text-stone-950">
-            {formatCalories(scaledTotalCalories)} kcal
+            {formatWholeCalories(scaledTotalCalories)} kcal
           </dd>
         </div>
         <div className="border-b border-stone-200 p-5 sm:border-r sm:border-b-0">
@@ -322,17 +323,19 @@ const RecipeContent = ({
                     {ingredient.ingredient_name}
                   </td>
                   <td className="py-4 pr-4 text-right whitespace-nowrap">
-                    {formatScaledQuantity(ingredient.quantity, scaleFactor)}{' '}
+                    {formatDecimal(
+                      Number(ingredient.quantity) * scaleFactor,
+                    )}{' '}
                     {ingredient.unit}
                   </td>
                   <td className="py-4 pr-4 text-right whitespace-nowrap">
-                    {formatCalories(
-                      calculateIngredientCalories(ingredient, scaleFactor),
+                    {formatWholeCalories(
+                      Number(ingredient.calories) * scaleFactor,
                     )}{' '}
                     kcal
                   </td>
                   <td className="py-4 pr-3 text-right whitespace-nowrap">
-                    {ingredient.calories_per_unit} kcal
+                    {formatDecimal(ingredient.calories_per_unit)} kcal
                   </td>
                 </tr>
               ))}
@@ -350,14 +353,6 @@ const RecipeContent = ({
     </>
   )
 }
-
-const quantityFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 4,
-})
-
-const calorieFormatter = new Intl.NumberFormat('en-US', {
-  maximumFractionDigits: 0,
-})
 
 function parseServingCount(value: string): number | null {
   const servingCount = Number(value)
@@ -379,37 +374,4 @@ function getServingInputError(value: string): string | null {
 
 function formatServingLabel(servings: number): string {
   return servings === 1 ? '1 serving' : `${servings} servings`
-}
-
-function formatScaledQuantity(quantity: string, scaleFactor: number): string {
-  const scaledQuantity = Number(quantity) * scaleFactor
-
-  if (!Number.isFinite(scaledQuantity)) {
-    return quantity
-  }
-
-  return quantityFormatter.format(scaledQuantity)
-}
-
-function formatCalories(calories: number): string {
-  return calorieFormatter.format(calories)
-}
-
-function calculateBaseTotalCalories(recipe: Recipe): number {
-  return recipe.ingredients.reduce(
-    (totalCalories, ingredient) =>
-      totalCalories + calculateIngredientCalories(ingredient),
-    0,
-  )
-}
-
-function calculateIngredientCalories(
-  ingredient: Recipe['ingredients'][number],
-  scaleFactor = 1,
-): number {
-  return (
-    Number(ingredient.quantity) *
-    Number(ingredient.calories_per_unit) *
-    scaleFactor
-  )
 }
