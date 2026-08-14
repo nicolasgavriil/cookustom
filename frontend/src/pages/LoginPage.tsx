@@ -2,6 +2,7 @@ import { LogIn } from 'lucide-react'
 import { useNavigate } from 'react-router'
 
 import { AuthForm } from '../components/AuthForm'
+import { DemoButton } from '../components/DemoButton'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useLoginMutation } from '../queries/authQueries'
 
@@ -38,6 +39,11 @@ export const LoginPage = () => {
         passwordAutoComplete="current-password"
         passwordMinLength={1}
         onSubmit={handleSubmit}
+      />
+      <DemoButton
+        buttonClassName="w-full"
+        className="mt-4 max-w-md"
+        variant="secondary"
       />
     </section>
   )

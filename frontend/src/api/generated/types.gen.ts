@@ -326,6 +326,10 @@ export type UserResponse = {
      * Id
      */
     id: number;
+    /**
+     * Is Demo
+     */
+    is_demo: boolean;
 };
 
 /**
@@ -421,6 +425,22 @@ export type RegisterUserAuthRegisterPostResponses = {
 };
 
 export type RegisterUserAuthRegisterPostResponse = RegisterUserAuthRegisterPostResponses[keyof RegisterUserAuthRegisterPostResponses];
+
+export type CreateDemoSessionDemoPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/demo';
+};
+
+export type CreateDemoSessionDemoPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: TokenResponse;
+};
+
+export type CreateDemoSessionDemoPostResponse = CreateDemoSessionDemoPostResponses[keyof CreateDemoSessionDemoPostResponses];
 
 export type HealthCheckHealthGetData = {
     body?: never;

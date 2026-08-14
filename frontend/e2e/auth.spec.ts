@@ -12,6 +12,45 @@ test('redirects logged-out users away from protected pages', async ({ page }) =>
   await expect(page.getByRole('heading', { name: 'Log in' })).toBeVisible()
 })
 
+test('opens an isolated populated demo without registration', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Explore demo' }).click()
+
+  await expect(page).toHaveURL(/\/recipes$/)
+  await expect(
+    page.getByRole('heading', { name: 'Recipe collection' }),
+  ).toBeVisible()
+  await expect(page.getByText('Demo session')).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Chicken rice bowl' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Avocado egg toast' }),
+  ).toBeVisible()
+
+  await page
+    .getByRole('button', { name: 'Show variants for Chicken rice bowl' })
+    .click()
+
+  await expect(
+    page.getByRole('link', { name: 'Higher-protein rice bowl' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Vegetarian rice bowl' }),
+  ).toBeVisible()
+})
+
+test('opens the demo from the login page', async ({ page }) => {
+  await page.goto('/login')
+  await page.getByRole('button', { name: 'Explore demo' }).click()
+
+  await expect(page).toHaveURL(/\/recipes$/)
+  await expect(page.getByText('Demo session')).toBeVisible()
+  await expect(
+    page.getByRole('link', { name: 'Chicken rice bowl' }),
+  ).toBeVisible()
+})
+
 test('restores the user from a stored token after refreshing', async ({ page }) => {
   await registerUser(page, testUsers.authRefresh)
 
