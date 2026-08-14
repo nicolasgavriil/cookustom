@@ -27,6 +27,12 @@ export async function login(request: LoginRequest): Promise<TokenResponse> {
   })
 }
 
+export async function createDemoSession(): Promise<TokenResponse> {
+  return fetchApiJson<TokenResponse>('/demo', {
+    method: 'POST',
+  })
+}
+
 export async function getCurrentUser(): Promise<User | null> {
   const token = tokenStorage.getAccessToken()
 

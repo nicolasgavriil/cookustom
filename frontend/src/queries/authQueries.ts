@@ -64,6 +64,23 @@ export const useRegisterMutation = () => {
   })
 }
 
+export const useDemoSessionMutation = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async () => {
+      const token = await authService.createDemoSession()
+      tokenStorage.setAccessToken(token.access_token)
+
+      return authService.getCurrentUser()
+    },
+    onSuccess: (user) => {
+      clearUserScopedQueryData(queryClient)
+      queryClient.setQueryData(currentUserQueryKey, user)
+    },
+  })
+}
+
 export const useLogout = () => {
   const queryClient = useQueryClient()
 

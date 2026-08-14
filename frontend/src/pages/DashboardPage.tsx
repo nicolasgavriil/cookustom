@@ -1,5 +1,6 @@
 import { BookOpen, Carrot, ChefHat, NotebookText } from 'lucide-react'
 
+import { DemoButton } from '../components/DemoButton'
 import { ButtonLink } from '../components/ui/Button'
 import { useCurrentUserQuery } from '../queries/authQueries'
 
@@ -42,7 +43,10 @@ export const DashboardPage = () => {
             </>
           ) : (
             <>
-              <ButtonLink to="/register">Create account</ButtonLink>
+              <DemoButton />
+              <ButtonLink variant="secondary" to="/register">
+                Create account
+              </ButtonLink>
               <ButtonLink variant="secondary" to="/login">
                 Log in
               </ButtonLink>

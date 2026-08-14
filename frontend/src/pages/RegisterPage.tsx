@@ -2,6 +2,7 @@ import { UserPlus } from 'lucide-react'
 import { useNavigate } from 'react-router'
 
 import { AuthForm } from '../components/AuthForm'
+import { DemoButton } from '../components/DemoButton'
 import { PageHeader } from '../components/ui/PageHeader'
 import { useRegisterMutation } from '../queries/authQueries'
 
@@ -40,6 +41,11 @@ export const RegisterPage = () => {
         passwordAutoComplete="new-password"
         passwordMinLength={8}
         onSubmit={handleSubmit}
+      />
+      <DemoButton
+        buttonClassName="w-full"
+        className="mt-4 max-w-md"
+        variant="secondary"
       />
     </section>
   )

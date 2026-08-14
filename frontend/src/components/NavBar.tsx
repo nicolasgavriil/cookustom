@@ -48,7 +48,9 @@ export const NavBar = () => {
           {currentUserQuery.data ? (
             <div className="hidden items-center gap-3 text-sm text-stone-600 md:flex">
               <span className="max-w-56 truncate">
-                {currentUserQuery.data.email}
+                {currentUserQuery.data.is_demo
+                  ? 'Demo session'
+                  : currentUserQuery.data.email}
               </span>
               <button
                 className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 hover:text-emerald-900"

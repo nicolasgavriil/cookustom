@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { Link, type LinkProps } from 'react-router'
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: ReactNode
