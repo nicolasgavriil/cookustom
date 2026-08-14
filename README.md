@@ -9,7 +9,8 @@ recipe variants.
 The app is built as a monorepo with a FastAPI backend, PostgreSQL database, and
 React frontend.
 
-- **Live app:** [cookustom.com](https://cookustom.com)
+- **Live app:** [cookustom.com](https://cookustom.com) - one-click demo, no
+  registration required
 - **API documentation:** [api.cookustom.com/docs](https://api.cookustom.com/docs)
 
 ## Motivation
@@ -25,6 +26,7 @@ counts, and creating recipe variants without overwriting the original.
 ## What It Does
 
 - Register and log in with JWT-based authentication
+- Explore an isolated, populated demo without creating an account
 - Manage a personal ingredient library with calories per gram, milliliter, or
   piece
 - Create recipes from saved ingredients
