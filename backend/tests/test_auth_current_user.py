@@ -25,6 +25,7 @@ def test_read_current_user_returns_authenticated_user(client: TestClient) -> Non
     assert response.status_code == 200
     data = response.json()
     assert data["email"] == "login.user@example.com"
+    assert data["is_demo"] is False
     assert "password" not in data
     assert "password_hash" not in data
 

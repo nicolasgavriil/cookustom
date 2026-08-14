@@ -23,6 +23,7 @@ def test_register_user_creates_user(client: TestClient) -> None:
     data = response.json()
     assert data["id"] > 0
     assert data["email"] == "new.user@example.com"
+    assert data["is_demo"] is False
     assert "created_at" in data
     assert "password" not in data
     assert "password_hash" not in data

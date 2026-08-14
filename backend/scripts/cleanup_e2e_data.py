@@ -1,12 +1,11 @@
 import asyncio
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.engine import make_url
 from sqlalchemy.exc import ArgumentError
 
 from app.core.config import settings
 from app.db.database import AsyncSessionLocal, engine
-from app.models.ingredient import Ingredient
 from app.models.recipe import Recipe
 from app.models.user import User
 
@@ -37,12 +36,13 @@ async def cleanup_e2e_data() -> None:
     validate_e2e_database_url()
 
     async with AsyncSessionLocal() as session:
-        e2e_user_ids = select(User.id).where(User.email.in_(E2E_EMAILS))
-        await session.execute(delete(Recipe).where(Recipe.user_id.in_(e2e_user_ids)))
-        await session.execute(
-            delete(Ingredient).where(Ingredient.user_id.in_(e2e_user_ids))
+        e2e_user_filter = or_(
+            User.email.in_(E2E_EMAILS),
+            User.demo_expires_at.is_not(None),
         )
-        await session.execute(delete(User).where(User.email.in_(E2E_EMAILS)))
+        e2e_user_ids = select(User.id).where(e2e_user_filter)
+        await session.execute(delete(Recipe).where(Recipe.user_id.in_(e2e_user_ids)))
+        await session.execute(delete(User).where(e2e_user_filter))
         await session.commit()
 
     await engine.dispose()

@@ -1,3 +1,4 @@
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -33,7 +34,9 @@ async def get_current_user(
         raise credentials_exception from error
 
     user = await db.get(User, user_id)
-    if user is None:
+    if user is None or (
+        user.demo_expires_at is not None and user.demo_expires_at <= datetime.now(UTC)
+    ):
         raise credentials_exception
 
     return user
