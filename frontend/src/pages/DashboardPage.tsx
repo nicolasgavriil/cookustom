@@ -1,4 +1,5 @@
 import { BookOpen, Carrot, ChefHat, NotebookText } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { DemoButton } from '../components/DemoButton'
 import { ButtonLink } from '../components/ui/Button'
@@ -56,30 +57,36 @@ export const DashboardPage = () => {
       </div>
 
       <div className="grid gap-4">
-        <div className="rounded-lg border border-stone-200 bg-white/80 p-5 shadow-sm">
+        <Link
+          className="group rounded-lg border border-stone-200 bg-white/80 p-5 text-inherit no-underline shadow-sm transition-colors hover:border-amber-300 hover:bg-amber-50/70 focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 focus-visible:outline-none"
+          to="/recipes"
+        >
           <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-amber-100 text-amber-800">
             <NotebookText className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="m-0 text-lg font-bold text-stone-950">
+          <h2 className="m-0 text-lg font-bold text-stone-950 group-hover:text-amber-900">
             Recipe collection
           </h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Save instructions, servings, ingredients, and calorie estimates in
             one place.
           </p>
-        </div>
-        <div className="rounded-lg border border-stone-200 bg-white/80 p-5 shadow-sm">
+        </Link>
+        <Link
+          className="group rounded-lg border border-stone-200 bg-white/80 p-5 text-inherit no-underline shadow-sm transition-colors hover:border-emerald-300 hover:bg-emerald-50/70 focus-visible:ring-2 focus-visible:ring-emerald-800 focus-visible:ring-offset-2 focus-visible:outline-none"
+          to="/ingredients"
+        >
           <div className="mb-4 flex size-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-800">
             <Carrot className="size-5" aria-hidden="true" />
           </div>
-          <h2 className="m-0 text-lg font-bold text-stone-950">
+          <h2 className="m-0 text-lg font-bold text-stone-950 group-hover:text-emerald-900">
             Ingredient library
           </h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">
             Reuse ingredients across recipes with calories per gram,
             milliliter, or piece.
           </p>
-        </div>
+        </Link>
       </div>
     </section>
   )
