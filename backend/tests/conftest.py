@@ -5,7 +5,7 @@ from collections.abc import AsyncGenerator, Generator
 import pytest
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
-from sqlalchemy import delete, select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
@@ -32,7 +32,6 @@ os.environ["JWT_SECRET_KEY"] = "test-jwt-secret-key-with-at-least-32-characters"
 from app.core.config import build_sqlalchemy_database_url  # noqa: E402
 from app.db.database import get_db  # noqa: E402
 from app.main import app  # noqa: E402
-from app.models.ingredient import Ingredient  # noqa: E402
 from app.models.recipe import Recipe  # noqa: E402
 from app.models.user import User  # noqa: E402
 
@@ -64,12 +63,13 @@ async def override_get_db() -> AsyncGenerator[AsyncSession]:
 
 async def delete_test_users() -> None:
     async with TestAsyncSessionLocal() as session:
-        test_user_ids = select(User.id).where(User.email.in_(TEST_EMAILS))
-        await session.execute(delete(Recipe).where(Recipe.user_id.in_(test_user_ids)))
-        await session.execute(
-            delete(Ingredient).where(Ingredient.user_id.in_(test_user_ids))
+        test_user_filter = or_(
+            User.email.in_(TEST_EMAILS),
+            User.demo_expires_at.is_not(None),
         )
-        await session.execute(delete(User).where(User.email.in_(TEST_EMAILS)))
+        test_user_ids = select(User.id).where(test_user_filter)
+        await session.execute(delete(Recipe).where(Recipe.user_id.in_(test_user_ids)))
+        await session.execute(delete(User).where(test_user_filter))
         await session.commit()
 
 

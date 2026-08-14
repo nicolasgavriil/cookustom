@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, ingredients, recipes
+from app.api.routes import auth, demo, ingredients, recipes
 from app.core.config import settings
 
 app = FastAPI(title=settings.app_name)
@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(demo.router)
 app.include_router(ingredients.router)
 app.include_router(recipes.router)
 
