@@ -1,4 +1,6 @@
 from datetime import UTC, datetime, timedelta
+from hashlib import sha256
+from secrets import token_urlsafe
 
 import jwt
 from jwt import InvalidTokenError
@@ -52,3 +54,11 @@ def decode_access_token(token: str) -> str:
         raise ValueError("Invalid access token subject")
 
     return subject
+
+
+def generate_refresh_token() -> str:
+    return token_urlsafe(32)
+
+
+def hash_refresh_token(token: str) -> str:
+    return sha256(token.encode("utf-8")).hexdigest()
