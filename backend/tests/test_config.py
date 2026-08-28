@@ -7,6 +7,8 @@ from pydantic_settings import SettingsConfigDict
 from app.core.config import (
     EXAMPLE_JWT_SECRET_KEY,
     MAX_ACCESS_TOKEN_EXPIRE_MINUTES,
+    MAX_DEMO_SESSION_EXPIRE_HOURS,
+    MAX_REFRESH_TOKEN_EXPIRE_DAYS,
     Settings,
     build_sqlalchemy_database_url,
 )
@@ -36,6 +38,9 @@ def test_settings_allow_local_config() -> None:
     assert settings.environment == "development"
     assert settings.jwt_secret_key.get_secret_value() == JWT_SECRET_KEY
     assert settings.sqlalchemy_database_url == DATABASE_URL
+    assert settings.access_token_expire_minutes == 15
+    assert settings.refresh_token_expire_days == 30
+    assert settings.demo_session_expire_hours == 4
 
 
 @pytest.mark.parametrize(
@@ -181,6 +186,36 @@ def test_settings_reject_invalid_access_token_lifetime(
 ) -> None:
     with pytest.raises(ValidationError):
         build_settings(access_token_expire_minutes=access_token_expire_minutes)
+
+
+@pytest.mark.parametrize(
+    "refresh_token_expire_days",
+    [
+        0,
+        -1,
+        MAX_REFRESH_TOKEN_EXPIRE_DAYS + 1,
+    ],
+)
+def test_settings_reject_invalid_refresh_token_lifetime(
+    refresh_token_expire_days: int,
+) -> None:
+    with pytest.raises(ValidationError):
+        build_settings(refresh_token_expire_days=refresh_token_expire_days)
+
+
+@pytest.mark.parametrize(
+    "demo_session_expire_hours",
+    [
+        0,
+        -1,
+        MAX_DEMO_SESSION_EXPIRE_HOURS + 1,
+    ],
+)
+def test_settings_reject_invalid_demo_session_lifetime(
+    demo_session_expire_hours: int,
+) -> None:
+    with pytest.raises(ValidationError):
+        build_settings(demo_session_expire_hours=demo_session_expire_hours)
 
 
 def test_settings_reject_unknown_environment() -> None:

@@ -8,6 +8,8 @@ from sqlalchemy.exc import ArgumentError
 EXAMPLE_JWT_SECRET_KEY = "replace-this-with-a-local-secret-at-least-32-bytes"
 MIN_JWT_SECRET_KEY_LENGTH = 32
 MAX_ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+MAX_REFRESH_TOKEN_EXPIRE_DAYS = 365
+MAX_DEMO_SESSION_EXPIRE_HOURS = 24
 ASYNC_POSTGRES_SCHEME = "postgresql+asyncpg"
 SUPPORTED_POSTGRES_SCHEMES = {"postgres", "postgresql", ASYNC_POSTGRES_SCHEME}
 LOCALHOST_CORS_VALUES = (
@@ -43,9 +45,19 @@ class Settings(BaseSettings):
     database_url: str
     jwt_secret_key: SecretStr
     access_token_expire_minutes: int = Field(
-        default=30,
+        default=15,
         gt=0,
         le=MAX_ACCESS_TOKEN_EXPIRE_MINUTES,
+    )
+    refresh_token_expire_days: int = Field(
+        default=30,
+        gt=0,
+        le=MAX_REFRESH_TOKEN_EXPIRE_DAYS,
+    )
+    demo_session_expire_hours: int = Field(
+        default=4,
+        gt=0,
+        le=MAX_DEMO_SESSION_EXPIRE_HOURS,
     )
     frontend_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
