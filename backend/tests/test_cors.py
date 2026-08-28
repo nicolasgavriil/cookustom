@@ -18,6 +18,7 @@ def test_frontend_origins_can_preflight_api_requests() -> None:
 
         assert response.status_code == 200
         assert response.headers["access-control-allow-origin"] == origin
+        assert response.headers["access-control-allow-credentials"] == "true"
 
 
 def test_unknown_origin_cannot_preflight_api_requests() -> None:

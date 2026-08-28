@@ -385,6 +385,22 @@ export type LoginUserAuthLoginPostResponses = {
 
 export type LoginUserAuthLoginPostResponse = LoginUserAuthLoginPostResponses[keyof LoginUserAuthLoginPostResponses];
 
+export type LogoutUserAuthLogoutPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutUserAuthLogoutPostResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type LogoutUserAuthLogoutPostResponse = LogoutUserAuthLogoutPostResponses[keyof LogoutUserAuthLogoutPostResponses];
+
 export type ReadCurrentUserAuthMeGetData = {
     body?: never;
     path?: never;
@@ -400,6 +416,22 @@ export type ReadCurrentUserAuthMeGetResponses = {
 };
 
 export type ReadCurrentUserAuthMeGetResponse = ReadCurrentUserAuthMeGetResponses[keyof ReadCurrentUserAuthMeGetResponses];
+
+export type RefreshAccessTokenAuthRefreshPostData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/auth/refresh';
+};
+
+export type RefreshAccessTokenAuthRefreshPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: TokenResponse;
+};
+
+export type RefreshAccessTokenAuthRefreshPostResponse = RefreshAccessTokenAuthRefreshPostResponses[keyof RefreshAccessTokenAuthRefreshPostResponses];
 
 export type RegisterUserAuthRegisterPostData = {
     body: UserCreateRequest;
