@@ -2,14 +2,18 @@ import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
+import jwt
 from fastapi.testclient import TestClient
 from sqlalchemy import select
 
-from app.core.security import create_access_token
+from app.api.auth_cookies import REFRESH_TOKEN_COOKIE_NAME
+from app.core.config import settings
+from app.core.security import JWT_ALGORITHM, create_access_token
 from app.models.ingredient import Ingredient
 from app.models.recipe import Recipe, RecipeIngredient
+from app.models.refresh_token import RefreshToken
 from app.models.user import User
-from tests.conftest import TestAsyncSessionLocal
+from tests.conftest import TestAsyncSessionLocal, register_user
 
 
 def auth_headers(token: str) -> dict[str, str]:
@@ -127,6 +131,59 @@ def test_create_demo_returns_authenticated_seeded_session(
     assert vegetarian["parent_recipe_id"] == original["id"]
     assert_decimal_equal(original["total_calories"], "1053")
     assert_decimal_equal(original["calories_per_serving"], "526.5")
+
+
+def test_demo_uses_access_token_until_demo_expiration_without_refresh_token(
+    client: TestClient,
+) -> None:
+    response = client.post("/demo")
+    assert response.status_code == 201
+    assert response.cookies.get(REFRESH_TOKEN_COOKIE_NAME) is None
+
+    access_token = response.json()["access_token"]
+    user_data = client.get("/auth/me", headers=auth_headers(access_token)).json()
+
+    async def get_demo_expiration() -> datetime:
+        async with TestAsyncSessionLocal() as session:
+            user = await session.get(User, user_data["id"])
+            assert user is not None
+            refresh_token = await session.scalar(
+                select(RefreshToken).where(RefreshToken.user_id == user.id)
+            )
+            assert refresh_token is None
+            assert user.demo_expires_at is not None
+            return user.demo_expires_at
+
+    demo_expires_at = asyncio.run(get_demo_expiration())
+    payload = jwt.decode(
+        access_token,
+        settings.jwt_secret_key.get_secret_value(),
+        algorithms=[JWT_ALGORITHM],
+    )
+    access_token_expires_at = datetime.fromtimestamp(payload["exp"], UTC)
+    assert abs((access_token_expires_at - demo_expires_at).total_seconds()) < 1
+    expected_expiry = datetime.now(UTC) + timedelta(
+        hours=settings.demo_session_expire_hours
+    )
+    assert abs((demo_expires_at - expected_expiry).total_seconds()) < 5
+
+
+def test_demo_clears_existing_refresh_cookie(client: TestClient) -> None:
+    register_user(client)
+    login_response = client.post(
+        "/auth/login",
+        json={
+            "email": "login.user@example.com",
+            "password": "securepass123",
+        },
+    )
+    assert login_response.status_code == 200
+    assert client.cookies.get(REFRESH_TOKEN_COOKIE_NAME) is not None
+
+    response = client.post("/demo")
+
+    assert response.status_code == 201
+    assert REFRESH_TOKEN_COOKIE_NAME not in client.cookies
 
 
 def test_create_demo_sessions_are_isolated(client: TestClient) -> None:
