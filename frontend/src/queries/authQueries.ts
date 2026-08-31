@@ -81,12 +81,15 @@ export const useDemoSessionMutation = () => {
   })
 }
 
-export const useLogout = () => {
+export const useLogoutMutation = () => {
   const queryClient = useQueryClient()
 
-  return () => {
-    authService.logout()
-    clearUserScopedQueryData(queryClient)
-    queryClient.setQueryData(currentUserQueryKey, null)
-  }
+  return useMutation({
+    mutationFn: authService.logout,
+    onSettled: () => {
+      tokenStorage.clearAccessToken()
+      clearUserScopedQueryData(queryClient)
+      queryClient.setQueryData(currentUserQueryKey, null)
+    },
+  })
 }

@@ -4,6 +4,7 @@ import { logout, registerUser } from './helpers'
 import { testUsers } from './testUsers'
 
 const apiBaseUrl = 'http://127.0.0.1:8001'
+const refreshTokenCookieName = 'cookustom_refresh_token'
 
 test('redirects logged-out users away from protected pages', async ({ page }) => {
   await page.goto('/recipes')
@@ -155,6 +156,44 @@ test('clears the stored token when the retried session request is unauthorized',
     )
     .toBeNull()
   expect(authMeRequestCount).toBe(2)
+})
+
+test('revokes the refresh token when logging out', async ({ page }) => {
+  await registerUser(page, testUsers.authLogout)
+
+  const refreshCookie = (
+    await page.context().cookies(`${apiBaseUrl}/auth`)
+  ).find((cookie) => cookie.name === refreshTokenCookieName)
+  if (refreshCookie === undefined) {
+    throw new Error('Expected login to set a refresh token cookie')
+  }
+
+  const logoutResponse = page.waitForResponse(
+    (response) =>
+      response.url() === `${apiBaseUrl}/auth/logout` &&
+      response.request().method() === 'POST',
+  )
+
+  await logout(page)
+
+  expect((await logoutResponse).status()).toBe(204)
+  expect(
+    (await page.context().cookies(`${apiBaseUrl}/auth`)).some(
+      (cookie) => cookie.name === refreshTokenCookieName,
+    ),
+  ).toBe(false)
+
+  await page.context().addCookies([refreshCookie])
+
+  const refreshStatus = await page.evaluate(async (url) => {
+    const response = await fetch(`${url}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+    })
+    return response.status
+  }, apiBaseUrl)
+
+  expect(refreshStatus).toBe(401)
 })
 
 test('does not show previous account data after account switch', async ({ page }) => {

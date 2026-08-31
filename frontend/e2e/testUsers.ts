@@ -3,6 +3,10 @@ export const testUsers = {
     email: 'e2e-auth-mutation@example.com',
     password: 'securepass123',
   },
+  authLogout: {
+    email: 'e2e-auth-logout@example.com',
+    password: 'securepass123',
+  },
   authRefocus: {
     email: 'e2e-auth-refocus@example.com',
     password: 'securepass123',

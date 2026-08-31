@@ -56,6 +56,8 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 }
 
-export function logout(): void {
-  tokenStorage.clearAccessToken()
+export async function logout(): Promise<void> {
+  await apiRequest<void>('/auth/logout', {
+    method: 'POST',
+  })
 }
