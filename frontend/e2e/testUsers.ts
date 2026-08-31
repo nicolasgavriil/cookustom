@@ -1,4 +1,8 @@
 export const testUsers = {
+  authMutation: {
+    email: 'e2e-auth-mutation@example.com',
+    password: 'securepass123',
+  },
   authRefocus: {
     email: 'e2e-auth-refocus@example.com',
     password: 'securepass123',

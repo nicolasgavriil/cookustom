@@ -1,4 +1,8 @@
-import { ApiError, fetchApiJson } from '../api/fetchApi'
+import {
+  ApiError,
+  apiRequest,
+  authenticatedApiRequest,
+} from '../api/fetchApi'
 import type {
   LoginRequest,
   TokenResponse,
@@ -12,7 +16,7 @@ const jsonHeaders = {
 }
 
 export async function register(request: UserCreateRequest): Promise<User> {
-  return fetchApiJson<User>('/auth/register', {
+  return apiRequest<User>('/auth/register', {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify(request),
@@ -20,7 +24,7 @@ export async function register(request: UserCreateRequest): Promise<User> {
 }
 
 export async function login(request: LoginRequest): Promise<TokenResponse> {
-  return fetchApiJson<TokenResponse>('/auth/login', {
+  return apiRequest<TokenResponse>('/auth/login', {
     method: 'POST',
     headers: jsonHeaders,
     body: JSON.stringify(request),
@@ -28,7 +32,7 @@ export async function login(request: LoginRequest): Promise<TokenResponse> {
 }
 
 export async function createDemoSession(): Promise<TokenResponse> {
-  return fetchApiJson<TokenResponse>('/demo', {
+  return apiRequest<TokenResponse>('/demo', {
     method: 'POST',
   })
 }
@@ -41,11 +45,7 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   try {
-    return await fetchApiJson<User>('/auth/me', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    return await authenticatedApiRequest<User>('/auth/me')
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       tokenStorage.clearAccessToken()

@@ -1,30 +1,29 @@
-import { fetchApi, fetchApiJson } from '../api/fetchApi'
+import { authenticatedApiRequest } from '../api/fetchApi'
 import type {
   Recipe,
   RecipeCreateRequest,
   RecipeSummary,
   RecipeUpdateRequest,
 } from '../api/types'
-import { tokenStorage } from '../utils/tokenStorage'
+
+const jsonHeaders = {
+  'Content-Type': 'application/json',
+}
 
 export async function listRecipes(): Promise<RecipeSummary[]> {
-  return fetchApiJson<RecipeSummary[]>('/recipes', {
-    headers: getAuthHeaders(),
-  })
+  return authenticatedApiRequest<RecipeSummary[]>('/recipes')
 }
 
 export async function getRecipe(recipeId: number): Promise<Recipe> {
-  return fetchApiJson<Recipe>(`/recipes/${recipeId}`, {
-    headers: getAuthHeaders(),
-  })
+  return authenticatedApiRequest<Recipe>(`/recipes/${recipeId}`)
 }
 
 export async function createRecipe(
   request: RecipeCreateRequest,
 ): Promise<Recipe> {
-  return fetchApiJson<Recipe>('/recipes', {
+  return authenticatedApiRequest<Recipe>('/recipes', {
     method: 'POST',
-    headers: getJsonAuthHeaders(),
+    headers: jsonHeaders,
     body: JSON.stringify(request),
   })
 }
@@ -33,44 +32,29 @@ export async function createRecipeVariant(
   sourceRecipeId: number,
   request: RecipeCreateRequest,
 ): Promise<Recipe> {
-  return fetchApiJson<Recipe>(`/recipes/${sourceRecipeId}/variants`, {
-    method: 'POST',
-    headers: getJsonAuthHeaders(),
-    body: JSON.stringify(request),
-  })
+  return authenticatedApiRequest<Recipe>(
+    `/recipes/${sourceRecipeId}/variants`,
+    {
+      method: 'POST',
+      headers: jsonHeaders,
+      body: JSON.stringify(request),
+    },
+  )
 }
 
 export async function updateRecipe(
   recipeId: number,
   request: RecipeUpdateRequest,
 ): Promise<Recipe> {
-  return fetchApiJson<Recipe>(`/recipes/${recipeId}`, {
+  return authenticatedApiRequest<Recipe>(`/recipes/${recipeId}`, {
     method: 'PUT',
-    headers: getJsonAuthHeaders(),
+    headers: jsonHeaders,
     body: JSON.stringify(request),
   })
 }
 
 export async function deleteRecipe(recipeId: number): Promise<void> {
-  await fetchApi(`/recipes/${recipeId}`, {
+  await authenticatedApiRequest<void>(`/recipes/${recipeId}`, {
     method: 'DELETE',
-    headers: getAuthHeaders(),
   })
-}
-
-function getAuthHeaders(): Headers {
-  const headers = new Headers()
-  const token = tokenStorage.getAccessToken()
-
-  if (token) {
-    headers.set('Authorization', `Bearer ${token}`)
-  }
-
-  return headers
-}
-
-function getJsonAuthHeaders(): Headers {
-  const headers = getAuthHeaders()
-  headers.set('Content-Type', 'application/json')
-  return headers
 }
