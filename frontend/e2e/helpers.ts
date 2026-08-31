@@ -17,7 +17,11 @@ export const registerUser = async (page: Page, user: TestUser) => {
 
 export const logout = async (page: Page) => {
   await page.getByRole('button', { name: 'Log out' }).first().click()
-  await expect(page.getByRole('link', { name: 'Log in' })).toBeVisible()
+  await expect(
+    page
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('link', { name: 'Log in' }),
+  ).toBeVisible()
 }
 
 export const createIngredient = async (

@@ -8,7 +8,10 @@ import {
 } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router'
 
-import { useCurrentUserQuery, useLogout } from '../queries/authQueries'
+import {
+  useCurrentUserQuery,
+  useLogoutMutation,
+} from '../queries/authQueries'
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   [
@@ -21,11 +24,14 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
 export const NavBar = () => {
   const navigate = useNavigate()
   const currentUserQuery = useCurrentUserQuery()
-  const logout = useLogout()
+  const logoutMutation = useLogoutMutation()
 
   const handleLogout = () => {
-    logout()
-    navigate('/')
+    logoutMutation.mutate(undefined, {
+      onSettled: () => {
+        navigate('/')
+      },
+    })
   }
 
   return (
@@ -53,8 +59,9 @@ export const NavBar = () => {
                   : currentUserQuery.data.email}
               </span>
               <button
-                className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 hover:text-emerald-900"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 hover:text-emerald-900 disabled:cursor-not-allowed disabled:text-stone-400"
                 type="button"
+                disabled={logoutMutation.isPending}
                 onClick={handleLogout}
               >
                 <LogOut className="size-4" aria-hidden="true" />
@@ -76,8 +83,9 @@ export const NavBar = () => {
                 Recipes
               </NavLink>
               <button
-                className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 hover:text-emerald-900 md:hidden"
+                className="inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-md border border-transparent bg-transparent px-3 py-2 text-sm font-semibold text-stone-700 hover:bg-stone-100 hover:text-emerald-900 disabled:cursor-not-allowed disabled:text-stone-400 md:hidden"
                 type="button"
+                disabled={logoutMutation.isPending}
                 onClick={handleLogout}
               >
                 <LogOut className="size-4" aria-hidden="true" />
