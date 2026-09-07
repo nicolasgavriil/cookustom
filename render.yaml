@@ -3,6 +3,9 @@ services:
     name: cookustom-api
     runtime: python
     rootDir: backend
+    buildFilter:
+      ignoredPaths:
+        - backend/scripts/cleanup_e2e_data.py
     region: singapore
     plan: starter
     buildCommand: uv sync --frozen --no-dev
