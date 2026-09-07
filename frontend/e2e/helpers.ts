@@ -39,7 +39,7 @@ export const createIngredient = async (
   await page.goto('/ingredients/new')
   await page.getByLabel('Name').fill(name)
   await page.getByLabel('Unit', { exact: true }).selectOption(unit)
-  await page.getByLabel('Calories per unit').fill(caloriesPerUnit)
+  await page.getByLabel('Calories (kcal)', { exact: true }).fill(caloriesPerUnit)
   await page.getByRole('button', { name: 'Create ingredient' }).click()
 
   await expect(
