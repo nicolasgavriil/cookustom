@@ -93,7 +93,7 @@ test('refreshes an invalid access token and retries a protected mutation', async
   await registerUser(page, testUsers.authMutation)
   await page.goto('/ingredients/new')
   await page.getByLabel('Name').fill('Refresh retry ingredient')
-  await page.getByLabel('Calories per unit').fill('1.5')
+  await page.getByLabel('Calories (kcal)', { exact: true }).fill('1.5')
 
   await page.evaluate(() => {
     localStorage.setItem('recipe_app_access_token', 'invalid-access-token')
@@ -200,7 +200,7 @@ test('does not show previous account data after account switch', async ({ page }
   await registerUser(page, testUsers.userA)
   await page.goto('/ingredients/new')
   await page.getByLabel('Name').fill('E2E user A ingredient')
-  await page.getByLabel('Calories per unit').fill('1.5')
+  await page.getByLabel('Calories (kcal)', { exact: true }).fill('1.5')
   await page.getByRole('button', { name: 'Create ingredient' }).click()
   await expect(
     page.getByRole('cell', { name: 'E2E user A ingredient' }),

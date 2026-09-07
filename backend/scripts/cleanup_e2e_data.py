@@ -11,6 +11,8 @@ from app.models.user import User
 
 TEST_DATABASE_NAME_SUFFIX = "_test"
 E2E_EMAILS = {
+    "e2e-ingredient-calculator@example.com",
+    "e2e-ingredient-validation@example.com",
     "e2e-auth-logout@example.com",
     "e2e-auth-mutation@example.com",
     "e2e-auth-refocus@example.com",

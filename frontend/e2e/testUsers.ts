@@ -1,4 +1,12 @@
 export const testUsers = {
+  ingredientCalculator: {
+    email: 'e2e-ingredient-calculator@example.com',
+    password: 'securepass123',
+  },
+  ingredientValidation: {
+    email: 'e2e-ingredient-validation@example.com',
+    password: 'securepass123',
+  },
   authMutation: {
     email: 'e2e-auth-mutation@example.com',
     password: 'securepass123',
