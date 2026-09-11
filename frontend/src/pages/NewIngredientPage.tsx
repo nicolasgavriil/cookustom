@@ -17,7 +17,6 @@ export const NewIngredientPage = () => {
       : null
 
   const handleSubmit = (values: IngredientFormValues) => {
-    createIngredientMutation.reset()
     createIngredientMutation.mutate(toIngredientCreateRequest(values), {
       onSuccess: () => {
         navigate('/ingredients')

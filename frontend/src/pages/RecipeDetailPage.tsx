@@ -42,7 +42,6 @@ export const RecipeDetailPage = () => {
       return
     }
 
-    deleteRecipeMutation.reset()
     deleteRecipeMutation.mutate(recipeToDelete.id, {
       onSuccess: () => {
         navigate('/recipes')

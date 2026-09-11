@@ -34,7 +34,6 @@ export const EditIngredientPage = () => {
       return
     }
 
-    updateIngredientMutation.reset()
     updateIngredientMutation.mutate(
       { ingredientId: ingredient.id, request: toIngredientUpdateRequest(values) },
       {
