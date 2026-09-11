@@ -15,7 +15,6 @@ export const RegisterPage = () => {
       : null
 
   const handleSubmit = (email: string, password: string) => {
-    registerMutation.reset()
     registerMutation.mutate(
       { email, password },
       {

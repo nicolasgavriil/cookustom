@@ -54,7 +54,6 @@ export const RecipesPage = () => {
       return
     }
 
-    deleteRecipeMutation.reset()
     deleteRecipeMutation.mutate(recipeId)
   }
 

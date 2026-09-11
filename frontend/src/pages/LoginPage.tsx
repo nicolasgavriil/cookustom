@@ -13,7 +13,6 @@ export const LoginPage = () => {
     loginMutation.error instanceof Error ? loginMutation.error.message : null
 
   const handleSubmit = (email: string, password: string) => {
-    loginMutation.reset()
     loginMutation.mutate(
       { email, password },
       {

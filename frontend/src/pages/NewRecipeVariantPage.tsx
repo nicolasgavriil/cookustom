@@ -38,7 +38,6 @@ export const NewRecipeVariantPage = () => {
       return
     }
 
-    createVariantMutation.reset()
     createVariantMutation.mutate(
       {
         sourceRecipeId: recipe.id,

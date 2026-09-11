@@ -38,7 +38,6 @@ export const EditRecipePage = () => {
       return
     }
 
-    updateRecipeMutation.reset()
     updateRecipeMutation.mutate(
       { recipeId: recipe.id, request: toRecipeUpdateRequest(values) },
       {

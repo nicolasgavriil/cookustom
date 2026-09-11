@@ -21,7 +21,6 @@ export const NewRecipePage = () => {
       : null
 
   const handleSubmit = (values: RecipeFormValues) => {
-    createRecipeMutation.reset()
     createRecipeMutation.mutate(toRecipeCreateRequest(values), {
       onSuccess: (recipe) => {
         navigate(`/recipes/${recipe.id}`)

@@ -28,7 +28,6 @@ export const IngredientsPage = () => {
       return
     }
 
-    deleteIngredientMutation.reset()
     deleteIngredientMutation.mutate(ingredientId)
   }
 

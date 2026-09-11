@@ -23,7 +23,6 @@ export const DemoButton = ({
       : null
 
   const handleClick = () => {
-    demoSessionMutation.reset()
     demoSessionMutation.mutate(undefined, {
       onSuccess: () => {
         navigate('/recipes')
