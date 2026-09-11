@@ -1,4 +1,20 @@
 export const testUsers = {
+  ingredientCreationRefresh: {
+    email: 'e2e-ingredient-creation-refresh@example.com',
+    password: 'securepass123',
+  },
+  recipeIngredientCreation: {
+    email: 'e2e-recipe-ingredient-creation@example.com',
+    password: 'securepass123',
+  },
+  recipeIngredientEditing: {
+    email: 'e2e-recipe-ingredient-editing@example.com',
+    password: 'securepass123',
+  },
+  variantIngredientCreation: {
+    email: 'e2e-variant-ingredient-creation@example.com',
+    password: 'securepass123',
+  },
   ingredientCalculator: {
     email: 'e2e-ingredient-calculator@example.com',
     password: 'securepass123',

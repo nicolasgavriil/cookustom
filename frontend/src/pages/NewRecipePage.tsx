@@ -58,11 +58,7 @@ export const NewRecipePage = () => {
         </StatusMessage>
       ) : null}
 
-      {ingredientsQuery.isSuccess && ingredients.length === 0 ? (
-        <StatusMessage>Add ingredients before creating recipes.</StatusMessage>
-      ) : null}
-
-      {ingredients.length > 0 ? (
+      {ingredientsQuery.data !== undefined ? (
         <RecipeForm
           availableIngredients={ingredients}
           submitLabel="Create recipe"

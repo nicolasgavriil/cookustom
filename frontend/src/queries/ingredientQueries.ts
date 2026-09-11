@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type {
+  Ingredient,
   IngredientCreateRequest,
   IngredientUpdateRequest,
 } from '../api/types'
@@ -21,7 +22,23 @@ export const useCreateIngredientMutation = () => {
   return useMutation({
     mutationFn: (request: IngredientCreateRequest) =>
       ingredientService.createIngredient(request),
-    onSuccess: () => {
+    onSuccess: (createdIngredient) => {
+      queryClient.setQueryData<Ingredient[]>(
+        ingredientsQueryKey,
+        (cachedIngredients) => {
+          if (cachedIngredients === undefined) {
+            return undefined
+          }
+
+          const otherIngredients = cachedIngredients.filter(
+            (existing) => existing.id !== createdIngredient.id,
+          )
+
+          return [...otherIngredients, createdIngredient].sort((left, right) =>
+            left.name.localeCompare(right.name),
+          )
+        },
+      )
       void queryClient.invalidateQueries({ queryKey: ingredientsQueryKey })
     },
   })
