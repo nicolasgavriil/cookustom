@@ -12,6 +12,7 @@ export type IngredientFormValues = {
 }
 
 type IngredientFormProps = {
+  className?: string
   defaultValues?: IngredientFormValues
   submitLabel: string
   error: string | null
@@ -28,6 +29,7 @@ const unitNames: Record<IngredientUnit, string> = {
 }
 
 export const IngredientForm = ({
+  className = 'mt-8 max-w-md rounded-lg border border-stone-200 bg-white/85 p-5 shadow-sm sm:p-6',
   defaultValues,
   submitLabel,
   error,
@@ -61,7 +63,7 @@ export const IngredientForm = ({
 
   return (
     <form
-      className="mt-8 flex max-w-md flex-col gap-5 rounded-lg border border-stone-200 bg-white/85 p-5 shadow-sm sm:p-6"
+      className={`flex flex-col gap-5 ${className}`}
       onSubmit={handleSubmit(onSubmit)}
     >
       <div>

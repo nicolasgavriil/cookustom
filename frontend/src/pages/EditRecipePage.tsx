@@ -86,7 +86,7 @@ export const EditRecipePage = () => {
         </StatusMessage>
       ) : null}
 
-      {recipe && ingredientsQuery.isSuccess ? (
+      {recipe && ingredientsQuery.data !== undefined ? (
         <>
           <div className="mt-6 max-w-4xl">
             <PageHeader
