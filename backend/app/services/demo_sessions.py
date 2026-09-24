@@ -34,7 +34,7 @@ class DemoRecipeSeed:
     title: str
     description: str
     base_servings: int
-    instructions: str
+    instructions: str | None
     ingredients: tuple[DemoRecipeIngredientSeed, ...]
     parent_key: str | None = None
 
@@ -48,6 +48,16 @@ DEMO_INGREDIENTS = (
     DemoIngredientSeed("oil", "Olive oil", "ml", Decimal("8.10")),
     DemoIngredientSeed("egg", "Egg", "piece", Decimal("72")),
     DemoIngredientSeed("toast", "Whole grain toast", "piece", Decimal("95")),
+    DemoIngredientSeed("oats", "Rolled oats", "g", Decimal("3.80")),
+    DemoIngredientSeed("milk", "Semi-skimmed milk", "ml", Decimal("0.46")),
+    DemoIngredientSeed("yogurt", "Plain Greek yogurt", "g", Decimal("0.73")),
+    DemoIngredientSeed("banana", "Banana", "g", Decimal("0.89")),
+    DemoIngredientSeed("berries", "Blueberries", "g", Decimal("0.57")),
+    DemoIngredientSeed("pasta", "Dry whole wheat pasta", "g", Decimal("3.50")),
+    DemoIngredientSeed("tomatoes", "Cherry tomatoes", "g", Decimal("0.18")),
+    DemoIngredientSeed("spinach", "Spinach", "g", Decimal("0.23")),
+    DemoIngredientSeed("chickpeas", "Cooked chickpeas", "g", Decimal("1.64")),
+    DemoIngredientSeed("feta", "Feta cheese", "g", Decimal("2.65")),
 )
 
 DEMO_RECIPES = (
@@ -83,6 +93,78 @@ DEMO_RECIPES = (
             DemoRecipeIngredientSeed("egg", Decimal("2")),
             DemoRecipeIngredientSeed("toast", Decimal("2")),
             DemoRecipeIngredientSeed("oil", Decimal("5")),
+        ),
+    ),
+    DemoRecipeSeed(
+        key="overnight-oats",
+        title="Banana overnight oats",
+        description="Prepare breakfast the night before with oats, milk, and yogurt.",
+        base_servings=1,
+        instructions=(
+            "Mix the oats, milk, and yogurt in a jar.\n"
+            "Cover and refrigerate overnight.\n"
+            "Top with sliced banana before serving."
+        ),
+        ingredients=(
+            DemoRecipeIngredientSeed("oats", Decimal("50")),
+            DemoRecipeIngredientSeed("milk", Decimal("120")),
+            DemoRecipeIngredientSeed("yogurt", Decimal("80")),
+            DemoRecipeIngredientSeed("banana", Decimal("100")),
+        ),
+    ),
+    DemoRecipeSeed(
+        key="yogurt-bowl",
+        parent_key="overnight-oats",
+        title="Blueberry yogurt bowl",
+        description="More yogurt, fewer oats, and blueberries for a quick breakfast.",
+        base_servings=1,
+        instructions=None,
+        ingredients=(
+            DemoRecipeIngredientSeed("yogurt", Decimal("200")),
+            DemoRecipeIngredientSeed("berries", Decimal("80")),
+            DemoRecipeIngredientSeed("banana", Decimal("60")),
+            DemoRecipeIngredientSeed("oats", Decimal("20")),
+        ),
+    ),
+    DemoRecipeSeed(
+        key="spinach-pasta",
+        title="Tomato and spinach pasta",
+        description="Whole wheat pasta with warm tomatoes, spinach, and crumbled feta.",
+        base_servings=3,
+        instructions=(
+            "Cook the pasta according to the package instructions, "
+            "reserving some cooking water.\n"
+            "Halve the tomatoes and saute them in olive oil until softened.\n"
+            "Add the spinach and stir until wilted.\n"
+            "Toss with the drained pasta and a splash of cooking water, "
+            "then top with feta."
+        ),
+        ingredients=(
+            DemoRecipeIngredientSeed("pasta", Decimal("240")),
+            DemoRecipeIngredientSeed("tomatoes", Decimal("300")),
+            DemoRecipeIngredientSeed("spinach", Decimal("150")),
+            DemoRecipeIngredientSeed("oil", Decimal("15")),
+            DemoRecipeIngredientSeed("feta", Decimal("90")),
+        ),
+    ),
+    DemoRecipeSeed(
+        key="chickpea-salad",
+        title="Chickpea and feta salad",
+        description="A colorful salad with chickpeas, fresh vegetables, and feta.",
+        base_servings=4,
+        instructions=(
+            "Rinse and drain the cooked chickpeas.\n"
+            "Halve the tomatoes, dice the pepper, and roughly chop the spinach.\n"
+            "Toss everything with olive oil and crumbled feta, "
+            "then divide into portions."
+        ),
+        ingredients=(
+            DemoRecipeIngredientSeed("chickpeas", Decimal("480")),
+            DemoRecipeIngredientSeed("tomatoes", Decimal("250")),
+            DemoRecipeIngredientSeed("pepper", Decimal("150")),
+            DemoRecipeIngredientSeed("spinach", Decimal("80")),
+            DemoRecipeIngredientSeed("feta", Decimal("120")),
+            DemoRecipeIngredientSeed("oil", Decimal("20")),
         ),
     ),
     DemoRecipeSeed(

@@ -39,6 +39,43 @@ test('opens an isolated populated demo without registration', async ({ page }) =
   await expect(
     page.getByRole('link', { name: 'Vegetarian rice bowl' }),
   ).toBeVisible()
+
+  for (const title of [
+    'Banana overnight oats',
+    'Tomato and spinach pasta',
+    'Chickpea and feta salad',
+  ]) {
+    await expect(page.getByRole('link', { name: title, exact: true })).toBeVisible()
+  }
+
+  await expect(
+    page.getByRole('link', { name: 'Blueberry yogurt bowl', exact: true }),
+  ).toHaveCount(0)
+  await page
+    .getByRole('button', { name: 'Show variants for Banana overnight oats' })
+    .click()
+
+  await page
+    .getByRole('link', { name: 'Blueberry yogurt bowl', exact: true })
+    .click()
+  await expect(
+    page.getByRole('heading', { name: 'Blueberry yogurt bowl', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('cell', { name: 'Blueberries', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Instructions', exact: true }),
+  ).toHaveCount(0)
+
+  await page.goto('/ingredients')
+  await expect(page.getByRole('row')).toHaveCount(19)
+  await expect(
+    page.getByRole('cell', { name: 'Rolled oats', exact: true }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('cell', { name: 'Semi-skimmed milk', exact: true }),
+  ).toBeVisible()
 })
 
 test('opens the demo from the login page', async ({ page }) => {
