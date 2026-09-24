@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import pytest
 from fastapi.testclient import TestClient
 
 from tests.conftest import login_user, register_user
@@ -277,3 +278,38 @@ def test_update_recipe_rejects_duplicate_ingredient_ids(
     )
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize(
+    "instruction_fields",
+    [{}, {"instructions": None}, {"instructions": ""}, {"instructions": "   "}],
+)
+def test_update_recipe_clears_instructions(
+    client: TestClient, instruction_fields: dict
+) -> None:
+    register_user(client)
+    token = login_user(client)
+    rice = create_ingredient(client, token, name="Rice")
+    recipe = create_recipe(
+        client, token, "Rice bowl", [{"ingredient_id": rice["id"], "quantity": "100"}]
+    )
+    payload = recipe_update_payload(rice["id"])
+    payload.pop("instructions")
+    payload.update(instruction_fields)
+
+    response = client.put(
+        f"/recipes/{recipe['id']}", headers=auth_headers(token), json=payload
+    )
+
+    assert response.status_code == 200
+    assert response.json()["instructions"] is None
+    detail = client.get(f"/recipes/{recipe['id']}", headers=auth_headers(token))
+    assert detail.status_code == 200
+    assert detail.json()["instructions"] is None
+
+    payload["instructions"] = "  Serve warm.  "
+    response = client.put(
+        f"/recipes/{recipe['id']}", headers=auth_headers(token), json=payload
+    )
+    assert response.status_code == 200
+    assert response.json()["instructions"] == "Serve warm."

@@ -113,7 +113,7 @@ export type RecipeCreateRequest = {
     /**
      * Instructions
      */
-    instructions: string;
+    instructions?: string | null;
     /**
      * Title
      */
@@ -199,7 +199,7 @@ export type RecipeResponse = {
     /**
      * Instructions
      */
-    instructions: string;
+    instructions: string | null;
     /**
      * Parent Recipe Id
      */
@@ -275,7 +275,7 @@ export type RecipeUpdateRequest = {
     /**
      * Instructions
      */
-    instructions: string;
+    instructions?: string | null;
     /**
      * Title
      */

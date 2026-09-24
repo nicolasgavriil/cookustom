@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 import { createIngredient, registerUser } from './helpers'
 import { testUsers } from './testUsers'
 
-test('creates an ingredient and recipe, then opens recipe detail', async ({
+test('creates a recipe, clears its instructions, and creates a variant without them', async ({
   page,
 }) => {
   await registerUser(page, testUsers.workflow)
@@ -31,6 +31,33 @@ test('creates an ingredient and recipe, then opens recipe detail', async ({
   await page.getByRole('button', { name: 'Increase servings' }).click()
 
   await expect(page.getByLabel('Target servings')).toHaveValue('3')
+
+  await page.getByRole('link', { name: 'Edit', exact: true }).click()
+  await page.getByLabel('Instructions').fill('')
+  await page.getByRole('button', { name: 'Save recipe' }).click()
+  await expect(page.getByRole('heading', { name: 'E2E pancakes' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Instructions', exact: true }),
+  ).toHaveCount(0)
+  await page.reload()
+  await expect(page.getByRole('heading', { name: 'E2E pancakes' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Instructions', exact: true }),
+  ).toHaveCount(0)
+
+  await page.getByRole('link', { name: 'Edit', exact: true }).click()
+  await expect(page.getByLabel('Instructions')).toHaveValue('')
+  await page.getByRole('button', { name: 'Save recipe' }).click()
+  await page.getByRole('link', { name: 'Create variant', exact: true }).click()
+  await expect(page.getByLabel('Instructions')).toHaveValue('')
+  await page.getByLabel('Title').fill('E2E pancakes variant')
+  await page.getByRole('button', { name: 'Create variant', exact: true }).click()
+  await expect(
+    page.getByRole('heading', { name: 'E2E pancakes variant' }),
+  ).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Instructions', exact: true }),
+  ).toHaveCount(0)
 })
 
 test('rounds fractional calories consistently in recipe list and detail', async ({
@@ -45,7 +72,6 @@ test('rounds fractional calories consistently in recipe list and detail', async 
   await page.goto('/recipes/new')
   await page.getByLabel('Title').fill('E2E calorie rounding')
   await page.getByLabel('Base servings').fill('1')
-  await page.getByLabel('Instructions').fill('Mix and serve.')
   await page
     .getByLabel('Ingredient')
     .selectOption({ label: 'E2E half-calorie ingredient (g)' })

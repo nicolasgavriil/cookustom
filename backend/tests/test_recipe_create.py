@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+import pytest
 from fastapi.testclient import TestClient
 
 from tests.conftest import login_user, register_user
@@ -259,13 +260,26 @@ def test_create_recipe_rejects_empty_title(client: TestClient) -> None:
     assert response.status_code == 422
 
 
-def test_create_recipe_rejects_empty_instructions(client: TestClient) -> None:
+@pytest.mark.parametrize(
+    "instruction_fields",
+    [{}, {"instructions": None}, {"instructions": ""}, {"instructions": "   "}],
+)
+def test_create_recipe_accepts_optional_instructions(
+    client: TestClient, instruction_fields: dict
+) -> None:
     register_user(client)
     token = login_user(client)
     rice = create_ingredient(client, token, name="Rice")
     payload = recipe_payload(ingredient_id=rice["id"])
-    payload["instructions"] = "   "
+    payload.pop("instructions")
+    payload.update(instruction_fields)
 
     response = client.post("/recipes", headers=auth_headers(token), json=payload)
 
-    assert response.status_code == 422
+    assert response.status_code == 201
+    assert response.json()["instructions"] is None
+    detail = client.get(
+        f"/recipes/{response.json()['id']}", headers=auth_headers(token)
+    )
+    assert detail.status_code == 200
+    assert detail.json()["instructions"] is None
