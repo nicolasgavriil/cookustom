@@ -99,7 +99,7 @@ def test_create_demo_returns_authenticated_seeded_session(
 
     assert ingredients_response.status_code == 200
     ingredients = ingredients_response.json()
-    assert len(ingredients) == 8
+    assert len(ingredients) == 18
     assert {ingredient["name"] for ingredient in ingredients} == {
         "Avocado",
         "Bell pepper",
@@ -109,6 +109,16 @@ def test_create_demo_returns_authenticated_seeded_session(
         "Egg",
         "Olive oil",
         "Whole grain toast",
+        "Rolled oats",
+        "Semi-skimmed milk",
+        "Plain Greek yogurt",
+        "Banana",
+        "Blueberries",
+        "Dry whole wheat pasta",
+        "Cherry tomatoes",
+        "Spinach",
+        "Cooked chickpeas",
+        "Feta cheese",
     }
     assert {ingredient["unit"] for ingredient in ingredients} == {
         "g",
@@ -118,8 +128,19 @@ def test_create_demo_returns_authenticated_seeded_session(
 
     assert recipes_response.status_code == 200
     recipes = recipes_response.json()
-    assert len(recipes) == 4
+    assert len(recipes) == 8
     recipes_by_title = {recipe["title"]: recipe for recipe in recipes}
+    assert set(recipes_by_title) == {
+        "Chicken rice bowl",
+        "Avocado egg toast",
+        "Banana overnight oats",
+        "Blueberry yogurt bowl",
+        "Tomato and spinach pasta",
+        "Chickpea and feta salad",
+        "Higher-protein rice bowl",
+        "Vegetarian rice bowl",
+    }
+    assert sum(recipe["parent_recipe_id"] is None for recipe in recipes) == 5
     original = recipes_by_title["Chicken rice bowl"]
     breakfast = recipes_by_title["Avocado egg toast"]
     higher_protein = recipes_by_title["Higher-protein rice bowl"]
@@ -129,8 +150,34 @@ def test_create_demo_returns_authenticated_seeded_session(
     assert breakfast["parent_recipe_id"] is None
     assert higher_protein["parent_recipe_id"] == original["id"]
     assert vegetarian["parent_recipe_id"] == original["id"]
+    oats = recipes_by_title["Banana overnight oats"]
+    yogurt = recipes_by_title["Blueberry yogurt bowl"]
+    assert oats["parent_recipe_id"] is None
+    assert yogurt["parent_recipe_id"] == oats["id"]
     assert_decimal_equal(original["total_calories"], "1053")
     assert_decimal_equal(original["calories_per_serving"], "526.5")
+
+    library_ids = {ingredient["id"] for ingredient in ingredients}
+    used_ingredient_ids = set()
+    for recipe in recipes:
+        response = client.get(f"/recipes/{recipe['id']}", headers=headers)
+        assert response.status_code == 200
+        detail = response.json()
+        assert detail["ingredients"]
+        for ingredient in detail["ingredients"]:
+            assert ingredient["ingredient_id"] in library_ids
+            used_ingredient_ids.add(ingredient["ingredient_id"])
+            assert Decimal(ingredient["quantity"]) > 0
+        if recipe["title"] == "Blueberry yogurt bowl":
+            assert detail["instructions"] is None
+            assert_decimal_equal(detail["total_calories"], "321")
+        else:
+            assert detail["instructions"]
+    assert used_ingredient_ids == library_ids
+    pasta = recipes_by_title["Tomato and spinach pasta"]
+    assert pasta["base_servings"] == 3
+    assert_decimal_equal(pasta["total_calories"], "1288.5")
+    assert_decimal_equal(pasta["calories_per_serving"], "429.5")
 
 
 def test_demo_uses_access_token_until_demo_expiration_without_refresh_token(
