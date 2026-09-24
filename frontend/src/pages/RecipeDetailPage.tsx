@@ -343,12 +343,14 @@ const RecipeContent = ({
         </div>
       </section>
 
-      <section className="mt-10">
-        <h2 className="m-0 text-xl font-bold text-stone-950">Instructions</h2>
-        <p className="mt-4 max-w-3xl whitespace-pre-wrap rounded-lg border border-stone-200 bg-white/85 p-5 leading-7 text-stone-700 shadow-sm">
-          {recipe.instructions}
-        </p>
-      </section>
+      {recipe.instructions ? (
+        <section className="mt-10">
+          <h2 className="m-0 text-xl font-bold text-stone-950">Instructions</h2>
+          <p className="mt-4 max-w-3xl whitespace-pre-wrap rounded-lg border border-stone-200 bg-white/85 p-5 leading-7 text-stone-700 shadow-sm">
+            {recipe.instructions}
+          </p>
+        </section>
+      ) : null}
     </>
   )
 }

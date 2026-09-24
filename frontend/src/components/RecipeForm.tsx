@@ -182,17 +182,8 @@ export const RecipeForm = ({
           <textarea
             className="min-h-40 w-full rounded-md border border-stone-300 bg-white px-3 py-2.5 text-stone-950 outline-emerald-700 focus:border-emerald-700"
             id="instructions"
-            {...register('instructions', {
-              required: 'Instructions are required',
-              validate: (value) =>
-                value.trim().length > 0 || 'Instructions are required',
-            })}
+            {...register('instructions')}
           />
-          {errors.instructions ? (
-            <p className="mt-2 text-sm text-rose-700">
-              {errors.instructions.message}
-            </p>
-          ) : null}
         </div>
 
         <div className="border-t border-stone-200 pt-6">

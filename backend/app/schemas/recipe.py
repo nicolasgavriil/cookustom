@@ -15,7 +15,7 @@ class RecipeCreateRequest(BaseModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = None
     base_servings: int = Field(ge=1)
-    instructions: str = Field(min_length=1)
+    instructions: str | None = None
     ingredients: list[RecipeIngredientCreateRequest] = Field(min_length=1)
 
     @field_validator("title")
@@ -37,11 +37,12 @@ class RecipeCreateRequest(BaseModel):
 
     @field_validator("instructions")
     @classmethod
-    def normalize_instructions(cls, value: str) -> str:
+    def normalize_instructions(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
         instructions = value.strip()
-        if not instructions:
-            raise ValueError("Instructions cannot be empty")
-        return instructions
+        return instructions or None
 
     @field_validator("ingredients")
     @classmethod
@@ -85,7 +86,7 @@ class RecipeSummaryResponse(BaseModel):
 
 
 class RecipeResponse(RecipeSummaryResponse):
-    instructions: str
+    instructions: str | None
     ingredients: list[RecipeIngredientResponse] = Field(
         validation_alias="recipe_ingredients"
     )
